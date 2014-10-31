@@ -1,0 +1,3 @@
+[submodule "ecos"]
+	path = ecos
+	url = git@github.com:embotech/ecos
