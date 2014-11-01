@@ -21,15 +21,15 @@ _ecos = Extension('_ecos', libraries = lib,
                         ('DLONG', None),
                         ('LDL_LONG', None),
                         ('CTRLC', 1)],
-                    include_dirs = ['ecos/include', 'ecos/ecos_bb', numpy.get_include(),
+                    include_dirs = ['ecos/include', numpy.get_include(),
                         'ecos/external/amd/include',
                         'ecos/external/ldl/include',
                         'ecos/external/SuiteSparse_config'],
                     sources = ['src/ecosmodule.c',
                         'ecos/external/ldl/src/ldl.c'
                     ] + glob('ecos/external/amd/src/*.c')
-                      + glob('ecos/src/*.c')
-                      + glob('ecos/ecos_bb/*.c'))
+                      + glob('ecos/src/*.c')            # glob source files
+                      + glob('ecos/ecos_bb/*.c'))       # glob bb source files
 
 setup(
     name = 'ecos',
