@@ -1,7 +1,7 @@
 # Python Wrapper for Embedded Conic Solver (ECOS)
 
-[![Build Status](https://travis-ci.org/ifa-ethz/ecos.svg?branch=master)](https://travis-ci.org/ifa-ethz/ecos)
-[![Build status](https://ci.appveyor.com/api/projects/status/689y0hsljr7i1vbp)](https://ci.appveyor.com/project/echu/ecos)
+[![Build Status](https://travis-ci.org/embotech/ecos-python.svg?branch=master)](https://travis-ci.org/embotech/ecos-python)
+[![Build Status](https://ci.appveyor.com/api/projects/status/78aatn417av1ul5u?svg=true)](https://ci.appveyor.com/project/echu/ecos-python)
 
 ECOS is a numerical software for solving convex second-order cone
 programs (SOCPs) of type
