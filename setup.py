@@ -43,7 +43,7 @@ setup(
     py_modules = ['ecos'],
     ext_modules = [_ecos],
     install_requires = [
-        "numpy >= 1.7",
-        "scipy >= 0.12"
+        "numpy >= 1.6",
+        "scipy >= 0.9"
     ]
 )
