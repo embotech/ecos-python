@@ -13,7 +13,7 @@ before_install:
     - pip install coverage
 # install dependencies
 install:
-	- sudo python setup.py build
+    - sudo python setup.py build
     - sudo python setup.py install
 # command to run tests
 script:
