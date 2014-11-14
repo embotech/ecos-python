@@ -273,42 +273,59 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       )
     ) { return NULL; }
 
-  if (bool_idx){
-    if (!PyList_Check(bool_idx)){
-      PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list");
-      return NULL;
-    }
-
-    num_bool = (idxint) PyList_Size(bool_idx);
-    for (i=0; i<num_bool; ++i){
-      if ( !PyLong_Check(PyList_GetItem(bool_idx,(Py_ssize_t) i)) 
-        && !PyInt_Check(PyList_GetItem(bool_idx,(Py_ssize_t) i))){
-        PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list of integers");
-        return NULL;
-      }
-    } 
-  }    
-
-  if (int_idx){
-    if (!PyList_Check(int_idx)){
-      PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list");
-      return NULL;
-    }
-
-    num_int = (idxint) PyList_Size(int_idx);
-    for (i=0; i<num_int; ++i){
-
-      if ( !PyLong_Check( PyList_GetItem(int_idx,(Py_ssize_t) i)) 
-        && !PyInt_Check(PyList_GetItem(int_idx,(Py_ssize_t) i)) ){
-        PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list of integers");
-        return NULL;
-      }
-    }
-  }
-
   if (checkNonnegativeInt("m", m) < 0) return NULL;
   if (checkNonnegativeInt("n", n) < 0) return NULL;
   if (checkNonnegativeInt("p", p) < 0) return NULL;
+
+  if (bool_idx){
+	  if (!PyList_Check(bool_idx)){
+		  PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list");
+		  return NULL;
+	  }
+
+	  /* Ensure the list of indices are monotonic */
+	  PyList_Sort(bool_idx);
+
+	  num_bool = (idxint)PyList_Size(bool_idx);
+	  for (i = 0; i<num_bool; ++i){
+		  if (!PyLong_Check(PyList_GetItem(bool_idx, (Py_ssize_t)i))
+			  && !PyInt_Check(PyList_GetItem(bool_idx, (Py_ssize_t)i))){
+			  PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list of integers");
+			  return NULL;
+		  }
+		  else if (PyLong_AsLong(PyList_GetItem(bool_idx, (Py_ssize_t)i)) >= n ||
+			  PyLong_AsLong(PyList_GetItem(bool_idx, (Py_ssize_t)i)) < 0){
+			  PyErr_SetString(PyExc_ValueError, "bool_vars_idx must be in range [0,n-1] ");
+			  return NULL;
+		  }
+	  }
+  }
+
+  if (int_idx){
+	  if (!PyList_Check(int_idx)){
+		  PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list");
+		  return NULL;
+	  }
+
+	  /* Ensure the list of indices are monotonic */
+	  PyList_Sort(int_idx);
+
+	  num_int = (idxint)PyList_Size(int_idx);
+	  for (i = 0; i<num_int; ++i){
+
+		  if (!PyLong_Check(PyList_GetItem(int_idx, (Py_ssize_t)i))
+			  && !PyInt_Check(PyList_GetItem(int_idx, (Py_ssize_t)i))){
+			  PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list of integers");
+			  return NULL;
+		  }
+		  else if (PyLong_AsLong(PyList_GetItem(int_idx, (Py_ssize_t)i)) >= n ||
+			  PyLong_AsLong(PyList_GetItem(int_idx, (Py_ssize_t)i)) < 0){
+			  PyErr_SetString(PyExc_ValueError, "int_vars_idx entries must be in range [0,n-1] ");
+			  return NULL;
+		  }
+	  }
+  }
+
 
   /* check the opts*/
   if (verbose)
