@@ -3,6 +3,7 @@
 
 #include <Python.h>
 #include "ecos.h"
+#include "ecos_bb.h"
 #include "numpy/arrayobject.h"
 /*
  * Define INLINE for MSVC compatibility.
@@ -164,6 +165,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* BEGIN VARIABLE DECLARATIONS */
   PyArrayObject *Gx, *Gi, *Gp, *c, *h;
+  PyListObject *bool_idx = NULL;
+  PyListObject *int_idx = NULL;
   PyArrayObject *Ax = NULL;
   PyArrayObject *Ai = NULL;
   PyArrayObject *Ap = NULL;
@@ -180,7 +183,6 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   idxint l = 0;
   idxint *q = NULL;
 
-
   pfloat *Gpr = NULL;
   idxint *Gjc = NULL;
   idxint *Gir = NULL;
@@ -193,24 +195,30 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   pfloat *hpr = NULL;
   pfloat *bpr = NULL;
 
+  idxint *bool_vars_idx = NULL;
+  idxint *int_vars_idx = NULL;
+  idxint num_bool = 0;
+  idxint num_int = 0;
+
   /* Default ECOS settings */
   settings opts_ecos;
 
   pwork* mywork;
+  ecos_bb_pwork* myecos_bb_work = NULL;
 
   idxint i;
   static char *kwlist[] = {"shape", "c", "Gx", "Gi", "Gp", "h", "dims",
       "Ax", "Ai", "Ap", "b",
       "verbose", "feastol", "abstol", "reltol",
       "feastol_inacc", "abstol_inacc", "reltol_inacc",
-      "max_iters", NULL};
+      "max_iters", "bool_vars_idx", "int_vars_idx", NULL};
   int intType, doubleType;
 
   /* parse the arguments and ensure they are the correct type */
 #ifdef DLONG
-  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddl";
+  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddlO!O!";
 #else
-  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddi";
+  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiO!O!";
 #endif
   PyArrayObject *Gx_arr, *Gi_arr, *Gp_arr;
   PyArrayObject *c_arr;
@@ -221,7 +229,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   PyArrayObject *Ai_arr = NULL;
   PyArrayObject *Ap_arr = NULL;
   PyArrayObject *b_arr = NULL;
-
+  
   idxint exitcode, numerr = 0;
   npy_intp veclen[1];
   PyObject *x, *y, *z, *s;
@@ -259,8 +267,44 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &opts_ecos.feastol_inacc,
       &opts_ecos.abstol_inacc,
       &opts_ecos.reltol_inacc,
-      &opts_ecos.maxit)
+      &opts_ecos.maxit,
+      &PyList_Type, &bool_idx,
+      &PyList_Type, &int_idx
+      )
     ) { return NULL; }
+
+  if (bool_idx){
+    if (!PyList_Check(bool_idx)){
+      PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list");
+      return NULL;
+    }
+
+    num_bool = (idxint) PyList_Size(bool_idx);
+    for (i=0; i<num_bool; ++i){
+      if ( !PyLong_Check(PyList_GetItem(bool_idx,(Py_ssize_t) i)) 
+        && !PyInt_Check(PyList_GetItem(bool_idx,(Py_ssize_t) i))){
+        PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list of integers");
+        return NULL;
+      }
+    } 
+  }    
+
+  if (int_idx){
+    if (!PyList_Check(int_idx)){
+      PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list");
+      return NULL;
+    }
+
+    num_int = (idxint) PyList_Size(int_idx);
+    for (i=0; i<num_int; ++i){
+
+      if ( !PyLong_Check( PyList_GetItem(int_idx,(Py_ssize_t) i)) 
+        && !PyInt_Check(PyList_GetItem(int_idx,(Py_ssize_t) i)) ){
+        PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list of integers");
+        return NULL;
+      }
+    }
+  }
 
   if (checkNonnegativeInt("m", m) < 0) return NULL;
   if (checkNonnegativeInt("n", n) < 0) return NULL;
@@ -474,7 +518,6 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     return NULL;
   }
 
-
   /* check that sum(q) + l = m */
   if( numConicVariables != m ){
       PyErr_SetString(PyExc_ValueError, "Number of rows of G does not match dims.l+sum(dims.q)");
@@ -488,32 +531,76 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       return NULL;
   }
 
-  /* This calls ECOS setup function. */
-  mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
-  if( mywork == NULL ){
-      PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
-      if(q) free(q);
-      Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
-      Py_DECREF(c_arr); Py_DECREF(h_arr);
-      if (b_arr) Py_DECREF(b_arr);
-      if (Ax_arr) Py_DECREF(Ax_arr);
-      if (Ai_arr) Py_DECREF(Ai_arr);
-      if (Ap_arr) Py_DECREF(Ap_arr);
-      return NULL;
+  if (bool_idx || int_idx){
+    if (bool_idx){
+      bool_vars_idx = malloc( num_bool*sizeof(idxint) );
+      for (i=0; i<num_bool; ++i) bool_vars_idx[i] = PyLong_AsLong(PyList_GetItem(bool_idx,i));
+    }    
+
+    if (int_idx){
+      int_vars_idx = malloc( num_int*sizeof(idxint) );
+      for (i=0; i<num_int; ++i) int_vars_idx[i] = PyLong_AsLong(PyList_GetItem(int_idx,i));
+    }
+
+    /* This calls ECOS setup function. */
+    myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, 
+      Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx);
+    if( myecos_bb_work == NULL ){
+        PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS_BB while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
+        if(q) free(q);
+        Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
+        Py_DECREF(c_arr); Py_DECREF(h_arr);
+        if (b_arr) Py_DECREF(b_arr);
+        if (Ax_arr) Py_DECREF(Ax_arr);
+        if (Ai_arr) Py_DECREF(Ai_arr);
+        if (Ap_arr) Py_DECREF(Ap_arr);
+        Py_DECREF(bool_idx);
+        return NULL;
+    }
+
+    mywork = myecos_bb_work->ecos_prob;
+
+    /* Set settings for ECOS. */
+    mywork->stgs->verbose = 0;
+    mywork->stgs->abstol = opts_ecos.abstol;
+    mywork->stgs->feastol = opts_ecos.feastol;
+    mywork->stgs->reltol = opts_ecos.reltol;
+    mywork->stgs->abstol_inacc = opts_ecos.abstol_inacc;
+    mywork->stgs->feastol_inacc = opts_ecos.feastol_inacc;
+    mywork->stgs->reltol_inacc = opts_ecos.reltol_inacc;
+    mywork->stgs->maxit = opts_ecos.maxit;
+
+    /* Solve! */
+    exitcode = ECOS_BB_solve(myecos_bb_work);
+
+  } else{
+    /* This calls ECOS setup function. */
+    mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
+    if( mywork == NULL ){
+        PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
+        if(q) free(q);
+        Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
+        Py_DECREF(c_arr); Py_DECREF(h_arr);
+        if (b_arr) Py_DECREF(b_arr);
+        if (Ax_arr) Py_DECREF(Ax_arr);
+        if (Ai_arr) Py_DECREF(Ai_arr);
+        if (Ap_arr) Py_DECREF(Ap_arr);
+        return NULL;
+    }
+
+    /* Set settings for ECOS. */
+    mywork->stgs->verbose = opts_ecos.verbose;
+    mywork->stgs->abstol = opts_ecos.abstol;
+    mywork->stgs->feastol = opts_ecos.feastol;
+    mywork->stgs->reltol = opts_ecos.reltol;
+    mywork->stgs->abstol_inacc = opts_ecos.abstol_inacc;
+    mywork->stgs->feastol_inacc = opts_ecos.feastol_inacc;
+    mywork->stgs->reltol_inacc = opts_ecos.reltol_inacc;
+    mywork->stgs->maxit = opts_ecos.maxit;
+
+    /* Solve! */
+    exitcode = ECOS_solve(mywork);
   }
-
-  /* Set settings for ECOS. */
-  mywork->stgs->verbose = opts_ecos.verbose;
-  mywork->stgs->abstol = opts_ecos.abstol;
-  mywork->stgs->feastol = opts_ecos.feastol;
-  mywork->stgs->reltol = opts_ecos.reltol;
-  mywork->stgs->abstol_inacc = opts_ecos.abstol_inacc;
-  mywork->stgs->feastol_inacc = opts_ecos.feastol_inacc;
-  mywork->stgs->reltol_inacc = opts_ecos.reltol_inacc;
-  mywork->stgs->maxit = opts_ecos.maxit;
-
-  /* Solve! */
-  exitcode = ECOS_solve(mywork);
 
   /* create output (all data is *deep copied*) */
   /* TODO: request CVXOPT API for constructing from existing pointer */
@@ -535,34 +622,67 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   veclen[0] = p;
   y = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->y);
 
-  /* info dict */
-  /* infostring */
-  switch( exitcode ){
-      case ECOS_OPTIMAL:
-          infostring = "Optimal solution found";
-          break;
-      case ECOS_MAXIT:
-          infostring = "Maximum number of iterations reached";
-          break;
-      case ECOS_PINF:
-          infostring = "Primal infeasible";
-          break;
-      case ECOS_DINF:
-          infostring = "Dual infeasible";
-          break;
-      case ECOS_NUMERICS:
-          infostring = "Run into numerical problems";
-          break;
-      case ECOS_OUTCONE:
-          infostring = "PROBLEM: Multipliers leaving the cone";
-          break;
-      default:
-          infostring = "UNKNOWN PROBLEM IN SOLVER";
-  }
+  if (bool_idx){
+    /* info dict */
+    /* infostring */
+    switch( exitcode ){
+        case MI_OPTIMAL_SOLN:
+            infostring = "Optimal branch and bound solution found";
+            break;
+        case MI_MAXITER_FEASIBLE_SOLN:
+            infostring = "Maximum iterations reached with feasible solution found";
+            break;
+        case MI_MAXITER_NO_SOLN:
+            infostring = "Maximum iterations reached with no feasible solution found";
+            break;
+        case MI_INFEASIBLE:
+            infostring = "Problem is infeasible";
+            break;
+        default:
+            infostring = "UNKNOWN PROBLEM IN BRANCH AND BOUND SOLVER";
+    }
+  } else {
+    /* info dict */
+    /* infostring */
+    switch( exitcode ){
+        case ECOS_OPTIMAL:
+            infostring = "Optimal solution found";
+            break;
+        case ECOS_OPTIMAL + ECOS_INACC_OFFSET:
+            infostring = "Close to optimal solution found";
+            break;
+        case ECOS_MAXIT:
+            infostring = "Maximum number of iterations reached";
+            break;
+        case ECOS_PINF:
+            infostring = "Primal infeasible";
+            break;
+        case ECOS_PINF + ECOS_INACC_OFFSET:
+            infostring = "Close to primal infeasible";
+            break;
+        case ECOS_DINF:
+            infostring = "Dual infeasible";
+            break;
+        case ECOS_DINF + ECOS_INACC_OFFSET:
+            infostring = "Close to dual infeasible";
+            break;
+        case ECOS_NUMERICS:
+            infostring = "Run into numerical problems";
+            break;
+        case ECOS_OUTCONE:
+            infostring = "PROBLEM: Multipliers leaving the cone";
+            break;
+        case ECOS_FATAL:
+            infostring = "PROBLEM: Fatal error during initialization";
+            break;
+        default:
+            infostring = "UNKNOWN PROBLEM IN SOLVER";
+    }
 
-  /* numerical errors */
-  if( (exitcode == ECOS_NUMERICS) || (exitcode == ECOS_OUTCONE) || (exitcode == ECOS_FATAL) ){
-      numerr = 1;
+    /* numerical errors */
+    if( (exitcode == ECOS_NUMERICS) || (exitcode == ECOS_OUTCONE) || (exitcode == ECOS_FATAL) ){
+        numerr = 1;
+    } 
   }
 
   /* timings */
@@ -634,8 +754,12 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   z = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->z);
 
   /* cleanup */
-  ECOS_cleanup(mywork, 4);
-
+  if (bool_idx){
+    ECOS_BB_cleanup(myecos_bb_work, 4);
+  }else{
+    ECOS_cleanup(mywork, 4);  
+  }
+  
   returnDict = Py_BuildValue(
     "{s:O,s:O,s:O,s:O,s:O}",
     "x",x,
@@ -648,13 +772,15 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* no longer need pointers to arrays that held primitives */
   if(q) free(q);
+  if(bool_vars_idx) free(bool_vars_idx);
+  if(int_vars_idx)  free(int_vars_idx);
   Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
   Py_DECREF(c_arr); Py_DECREF(h_arr);
   if (b_arr) Py_DECREF(b_arr);
   if (Ax_arr) Py_DECREF(Ax_arr);
   if (Ai_arr) Py_DECREF(Ai_arr);
   if (Ap_arr) Py_DECREF(Ap_arr);
-
+  
   return returnDict;
 }
 

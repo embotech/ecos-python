@@ -40,6 +40,8 @@ setup(
     url = 'http://github.com/embotech/ecos',
     description = 'This is the Python package for ECOS: Embedded Cone Solver. See Github page for more information.',
     license = "GPLv3",
+    package_dir={'': 'src'},
+    packages = [''],
     py_modules = ['ecos'],
     ext_modules = [_ecos],
     install_requires = [

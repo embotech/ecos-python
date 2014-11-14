@@ -55,6 +55,7 @@ def solve(c,G,h,dims,A=None,b=None, **kwargs):
     else:
         data, indices, colptr = G.data, G.indices, G.indptr
 
+    
     if A is None:
         return _ecos.csolve((m,n1,p), c, data, indices, colptr, h, dims, **kwargs)
     else:
