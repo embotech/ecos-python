@@ -1,8 +1,8 @@
+from __future__ import print_function
 import ecos
 import numpy as np
 from scipy import *
 import scipy.sparse as sp
-from __future__ import print_function
 
 c = np.array([-1., -1.])
 h = np.array([ 4., 12., 0. , 0.])
