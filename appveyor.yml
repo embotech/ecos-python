@@ -34,6 +34,9 @@ environment:
       CONDA_NPY: "18"
 
 install:
+  # initialize the submodule
+  - git submodule update --init --recursive
+
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
 
