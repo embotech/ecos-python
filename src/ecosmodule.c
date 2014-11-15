@@ -577,6 +577,16 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
     mywork = myecos_bb_work->ecos_prob;
 
+    /* Set settings for ECOS BB. */
+    myecos_bb_work->stgs->verbose = opts_ecos.verbose;
+    myecos_bb_work->stgs->abstol = opts_ecos.abstol;
+    myecos_bb_work->stgs->feastol = opts_ecos.feastol;
+    myecos_bb_work->stgs->reltol = opts_ecos.reltol;
+    myecos_bb_work->stgs->abstol_inacc = opts_ecos.abstol_inacc;
+    myecos_bb_work->stgs->feastol_inacc = opts_ecos.feastol_inacc;
+    myecos_bb_work->stgs->reltol_inacc = opts_ecos.reltol_inacc;
+    myecos_bb_work->stgs->maxit = opts_ecos.maxit;
+
     /* Set settings for ECOS. */
     mywork->stgs->verbose = 0;
     mywork->stgs->abstol = opts_ecos.abstol;
