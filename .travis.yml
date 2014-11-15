@@ -12,9 +12,7 @@ before_install:
     - sudo apt-get install python-numpy python-scipy
     - pip install coverage
 # install dependencies
-install:
-    - sudo python setup.py build
-    - sudo python setup.py install
+    - pip install -e .
 # command to run tests
 script:
     - nosetests --with-cover --cover-package=ecos src/test_interface.py src/test_interface_bb.py
