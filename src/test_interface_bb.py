@@ -20,7 +20,7 @@ print(sol['x'])
 
 c = np.array([-1., -1.])
 h = np.array([ 4., 12., 0. , 0.])
-bool_idx = [0]
+bool_idx = []
 G = sp.csc_matrix( (array([2.0, 3.0, -1.0, 1.0, 4.0, -1.0]), 
 	array([0, 1, 2, 0, 1, 3]), 
 	array([0, 3, 6])) )    

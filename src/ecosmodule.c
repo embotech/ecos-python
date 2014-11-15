@@ -548,7 +548,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       return NULL;
   }
 
-  if (bool_idx || int_idx){
+  if (num_bool > 0 || num_int > 0){
     if (bool_idx){
       bool_vars_idx = malloc( num_bool*sizeof(idxint) );
       for (i=0; i<num_bool; ++i) bool_vars_idx[i] = PyLong_AsLong(PyList_GetItem(bool_idx,i));
