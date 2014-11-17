@@ -289,7 +289,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 	  num_bool = (idxint)PyList_Size((PyObject *) bool_idx);
 	  for (i = 0; i<num_bool; ++i){
 		  if (!PyLong_Check(PyList_GetItem((PyObject *) bool_idx, (Py_ssize_t)i))
-			  && !PyInt_Check(PyList_GetItem(PyObject *) (bool_idx, (Py_ssize_t)i))){
+			  && !PyInt_Check(PyList_GetItem((PyObject *) bool_idx, (Py_ssize_t)i))){
 			  PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list of integers");
 			  return NULL;
 		  }
