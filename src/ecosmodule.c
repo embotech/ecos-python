@@ -229,7 +229,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   PyArrayObject *Ai_arr = NULL;
   PyArrayObject *Ap_arr = NULL;
   PyArrayObject *b_arr = NULL;
-  
+
   idxint exitcode, numerr = 0;
   npy_intp veclen[1];
   PyObject *x, *y, *z, *s;
@@ -284,17 +284,17 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 	  }
 
 	  /* Ensure the list of indices are monotonic */
-	  PyList_Sort(bool_idx);
+	  PyList_Sort((PyObject *) bool_idx);
 
-	  num_bool = (idxint)PyList_Size(bool_idx);
+	  num_bool = (idxint)PyList_Size((PyObject *) bool_idx);
 	  for (i = 0; i<num_bool; ++i){
-		  if (!PyLong_Check(PyList_GetItem(bool_idx, (Py_ssize_t)i))
-			  && !PyInt_Check(PyList_GetItem(bool_idx, (Py_ssize_t)i))){
+		  if (!PyLong_Check(PyList_GetItem((PyObject *) bool_idx, (Py_ssize_t)i))
+			  && !PyInt_Check(PyList_GetItem(PyObject *) (bool_idx, (Py_ssize_t)i))){
 			  PyErr_SetString(PyExc_TypeError, "bool_vars_idx must be a list of integers");
 			  return NULL;
 		  }
-		  else if (PyLong_AsLong(PyList_GetItem(bool_idx, (Py_ssize_t)i)) >= n ||
-			  PyLong_AsLong(PyList_GetItem(bool_idx, (Py_ssize_t)i)) < 0){
+		  else if (PyLong_AsLong(PyList_GetItem((PyObject *) bool_idx, (Py_ssize_t)i)) >= n ||
+			  PyLong_AsLong(PyList_GetItem((PyObject *) bool_idx, (Py_ssize_t)i)) < 0){
 			  PyErr_SetString(PyExc_ValueError, "bool_vars_idx must be in range [0,n-1] ");
 			  return NULL;
 		  }
@@ -308,18 +308,18 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 	  }
 
 	  /* Ensure the list of indices are monotonic */
-	  PyList_Sort(int_idx);
+	  PyList_Sort((PyObject *) int_idx);
 
-	  num_int = (idxint)PyList_Size(int_idx);
+	  num_int = (idxint)PyList_Size((PyObject *) int_idx);
 	  for (i = 0; i<num_int; ++i){
 
-		  if (!PyLong_Check(PyList_GetItem(int_idx, (Py_ssize_t)i))
-			  && !PyInt_Check(PyList_GetItem(int_idx, (Py_ssize_t)i))){
+		  if (!PyLong_Check(PyList_GetItem((PyObject *) int_idx, (Py_ssize_t)i))
+			  && !PyInt_Check(PyList_GetItem((PyObject *) int_idx, (Py_ssize_t)i))){
 			  PyErr_SetString(PyExc_TypeError, "int_vars_idx must be a list of integers");
 			  return NULL;
 		  }
-		  else if (PyLong_AsLong(PyList_GetItem(int_idx, (Py_ssize_t)i)) >= n ||
-			  PyLong_AsLong(PyList_GetItem(int_idx, (Py_ssize_t)i)) < 0){
+		  else if (PyLong_AsLong(PyList_GetItem((PyObject *) int_idx, (Py_ssize_t)i)) >= n ||
+			  PyLong_AsLong(PyList_GetItem((PyObject *) int_idx, (Py_ssize_t)i)) < 0){
 			  PyErr_SetString(PyExc_ValueError, "int_vars_idx entries must be in range [0,n-1] ");
 			  return NULL;
 		  }
@@ -551,16 +551,16 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if (num_bool > 0 || num_int > 0){
     if (bool_idx){
       bool_vars_idx = malloc( num_bool*sizeof(idxint) );
-      for (i=0; i<num_bool; ++i) bool_vars_idx[i] = PyLong_AsLong(PyList_GetItem(bool_idx,i));
-    }    
+      for (i=0; i<num_bool; ++i) bool_vars_idx[i] = PyLong_AsLong(PyList_GetItem((PyObject *) bool_idx,i));
+    }
 
     if (int_idx){
       int_vars_idx = malloc( num_int*sizeof(idxint) );
-      for (i=0; i<num_int; ++i) int_vars_idx[i] = PyLong_AsLong(PyList_GetItem(int_idx,i));
+      for (i=0; i<num_int; ++i) int_vars_idx[i] = PyLong_AsLong(PyList_GetItem((PyObject *) int_idx,i));
     }
 
     /* This calls ECOS setup function. */
-    myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, 
+    myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir,
       Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx);
     if( myecos_bb_work == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS_BB while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
@@ -709,7 +709,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     /* numerical errors */
     if( (exitcode == ECOS_NUMERICS) || (exitcode == ECOS_OUTCONE) || (exitcode == ECOS_FATAL) ){
         numerr = 1;
-    } 
+    }
   }
 
   /* timings */
@@ -784,9 +784,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if (bool_idx){
     ECOS_BB_cleanup(myecos_bb_work, 4);
   }else{
-    ECOS_cleanup(mywork, 4);  
+    ECOS_cleanup(mywork, 4);
   }
-  
+
   returnDict = Py_BuildValue(
     "{s:O,s:O,s:O,s:O,s:O}",
     "x",x,
@@ -807,7 +807,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if (Ax_arr) Py_DECREF(Ax_arr);
   if (Ai_arr) Py_DECREF(Ai_arr);
   if (Ap_arr) Py_DECREF(Ap_arr);
-  
+
   return returnDict;
 }
 
