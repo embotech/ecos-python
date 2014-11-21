@@ -62,35 +62,30 @@ If using a newer version of Python, you can use a newer version of
 Visual Studio. For instance, Python 3.3 is built against [Visual Studio
 2010](http://go.microsoft.com/?linkid=9709949).
 
-## Using ECOS from Python
+##Calling ECOS from Python
+
 After installing the ECOS interface, you must import the module with
 ```
 import ecos
 ```
-This module provides a single function `ecos` with one of the following
-calling sequences:
+This module provides a single function `ecos` with one of the following calling sequences:
 ```
 solution = ecos.solve(c,G,h,dims)
 solution = ecos.solve(c,G,h,dims,A,b,**kwargs)
 ```
-The arguments `c`, `h`, and `b` are Numpy arrays (i.e., matrices with a
-single column).  The arguments `G` and `A` are Scipy *sparse* matrices
-in CSR format; if they are not of the proper format, ECOS will attempt
-to convert them.  The argument `dims` is a dictionary with two fields,
-`dims['l']` and `dims['q']`. These are the same fields as in the Matlab
-case. If the fields are omitted or empty, they default to 0. The
-argument `kwargs` can include the keywords `feastol`, `abstol`,
-`reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for
-tolerance values, `max_iters` for the maximum number of iterations, the
-Boolean `verbose`, and `integer_vars_idx` a Numpy array of `int`s which
-index the integer variables. The arguments `A`, `b`, and `kwargs` are
-optional.
+The arguments `c`, `h`, and `b` are Numpy arrays (i.e., matrices with a single
+column).  The arguments `G` and `A` are Scipy *sparse* matrices in CSR format;
+if they are not of the proper format, ECOS will attempt to convert them.  The
+argument `dims` is a dictionary with two fields, `dims['l']` and `dims['q']`.
+These are the same fields as in the Matlab case. If the fields are omitted or
+empty, they default to 0.
+The argument `kwargs` can include the keywords
+`feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
+`max_iters` for the maximum number of iterations, the Boolean `verbose`, `bool_vars_idx`, a list of `int`s which index the boolean variables, and `int_vars_idx`, a list of `int`s which index the integer variables.
+The arguments `A`, `b`, and `kwargs` are optional.
 
-The returned object is a dictionary containing the fields
-`solution['x']`, `solution['y']`, `solution['s']`, `solution['z']`, and
-`solution['info']`. The first four are Numpy arrays containing the
-relevant solution. The last field contains a dictionary with the same
-fields as the `info` struct in the MATLAB interface.
+The returned object is a dictionary containing the fields `solution['x']`, `solution['y']`, `solution['s']`, `solution['z']`, and `solution['info']`.
+The first four are Numpy arrays containing the relevant solution. The last field contains a dictionary with the same fields as the `info` struct in the MATLAB interface.
 
 ## Using ECOS with CVXPY
 
