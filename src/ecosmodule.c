@@ -173,6 +173,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   PyArrayObject *b = NULL;
   PyObject *dims = NULL;
   PyObject *verbose = NULL;
+  PyObject *mi_verbose = NULL;
   idxint n;           /* number or variables            */
   idxint m;           /* number of conic variables      */
   idxint p = 0;       /* number of equality constraints */
@@ -202,6 +203,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* Default ECOS settings */
   settings opts_ecos;
+  settings_bb opts_ecos_bb;
 
   pwork* mywork;
   ecos_bb_pwork* myecos_bb_work = NULL;
@@ -211,14 +213,16 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       "Ax", "Ai", "Ap", "b",
       "verbose", "feastol", "abstol", "reltol",
       "feastol_inacc", "abstol_inacc", "reltol_inacc",
-      "max_iters", "bool_vars_idx", "int_vars_idx", NULL};
+      "max_iters", "bool_vars_idx", "int_vars_idx", 
+      "mi_verbose", "mi_max_iters", "mi_abs_eps", 
+      "mi_rel_eps", "mi_int_tol", NULL};
   int intType, doubleType;
 
   /* parse the arguments and ensure they are the correct type */
 #ifdef DLONG
-  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddlO!O!";
+  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddlO!O!O!lddd";
 #else
-  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiO!O!";
+  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiO!O!O!iddd";
 #endif
   PyArrayObject *Gx_arr, *Gi_arr, *Gp_arr;
   PyArrayObject *c_arr;
@@ -248,6 +252,12 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   opts_ecos.maxit = MAXIT;
   opts_ecos.verbose = VERBOSE;
 
+  opts_ecos_bb.verbose = 1;         
+  opts_ecos_bb.maxit = MI_MAXITER;
+  opts_ecos_bb.abs_tol_gap = MI_ABS_EPS;     
+  opts_ecos_bb.rel_tol_gap = MI_REL_EPS;
+  opts_ecos_bb.integer_tol = MI_INT_TOL;
+
   if( !PyArg_ParseTupleAndKeywords(args, kwargs, argparse_string, kwlist,
       &m, &n, &p,
       &PyArray_Type, &c,
@@ -269,7 +279,12 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &opts_ecos.reltol_inacc,
       &opts_ecos.maxit,
       &PyList_Type, &bool_idx,
-      &PyList_Type, &int_idx
+      &PyList_Type, &int_idx,
+      &PyBool_Type, &opts_ecos_bb.verbose,
+      &opts_ecos_bb.maxit,
+      &opts_ecos_bb.abs_tol_gap,
+      &opts_ecos_bb.rel_tol_gap, 
+      &opts_ecos_bb.integer_tol 
       )
     ) { return NULL; }
 
@@ -337,6 +352,13 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if (checkPositiveFloat("abstol_inacc", opts_ecos.abstol_inacc) < 0) return NULL;
   if (checkPositiveFloat("feastol_inacc", opts_ecos.feastol_inacc) < 0) return NULL;
   if (checkPositiveFloat("reltol_inacc", opts_ecos.reltol_inacc) < 0) return NULL;
+
+  if (mi_verbose)
+      opts_ecos_bb.verbose = (idxint) PyObject_IsTrue(mi_verbose);
+  if (checkNonnegativeInt("mi_max_iters", opts_ecos_bb.maxit) < 0) return NULL;
+  if (checkPositiveFloat("mi_abs_eps", opts_ecos_bb.abs_tol_gap) < 0) return NULL;
+  if (checkPositiveFloat("mi_rel_eps", opts_ecos_bb.rel_tol_gap) < 0) return NULL;
+  if (checkPositiveFloat("mi_int_tol", opts_ecos_bb.integer_tol) < 0) return NULL;
 
   /* get the typenum for the primitive int and double types */
   intType = getIntType();
@@ -561,7 +583,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
     /* This calls ECOS setup function. */
     myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir,
-      Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx);
+      Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx, &opts_ecos_bb);
     if( myecos_bb_work == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS_BB while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
         if(q) free(q);
@@ -577,18 +599,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
     mywork = myecos_bb_work->ecos_prob;
 
-    /* Set settings for ECOS BB. */
-    myecos_bb_work->stgs->verbose = opts_ecos.verbose;
-    myecos_bb_work->stgs->abstol = opts_ecos.abstol;
-    myecos_bb_work->stgs->feastol = opts_ecos.feastol;
-    myecos_bb_work->stgs->reltol = opts_ecos.reltol;
-    myecos_bb_work->stgs->abstol_inacc = opts_ecos.abstol_inacc;
-    myecos_bb_work->stgs->feastol_inacc = opts_ecos.feastol_inacc;
-    myecos_bb_work->stgs->reltol_inacc = opts_ecos.reltol_inacc;
-    myecos_bb_work->stgs->maxit = opts_ecos.maxit;
-
     /* Set settings for ECOS. */
-    mywork->stgs->verbose = 0;
+    mywork->stgs->verbose = opts_ecos.verbose;
     mywork->stgs->abstol = opts_ecos.abstol;
     mywork->stgs->feastol = opts_ecos.feastol;
     mywork->stgs->reltol = opts_ecos.reltol;
