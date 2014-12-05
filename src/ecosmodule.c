@@ -201,6 +201,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   idxint num_bool = 0;
   idxint num_int = 0;
 
+  long mi_iterations = -1;
+
   /* Default ECOS settings */
   settings opts_ecos;
   settings_bb opts_ecos_bb;
@@ -611,7 +613,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
     /* Solve! */
     exitcode = ECOS_BB_solve(myecos_bb_work);
-
+    mi_iterations =(long) myecos_bb_work->iter;
+    
   } else{
     /* This calls ECOS setup function. */
     mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
@@ -746,9 +749,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   infoDict = Py_BuildValue(
 #if PROFILING > 0
-    "{s:l,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:l,s:s,s:O,s:l}",
+    "{s:l,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:l,s:l,s:s,s:O,s:l}",
 #else
-    "{s:l,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:l,s:s,s:l}",
+    "{s:l,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:l,s:l,s:s,s:l}",
 #endif
     "exitFlag", exitcode,
     "pcost", (double)mywork->info->pcost,
@@ -763,6 +766,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     "relgap",(double)mywork->info->relgap,
     "r0",(double)mywork->stgs->feastol,
     "iter",mywork->info->iter,
+    "mi_iter",mi_iterations,
     "infostring",infostring,
 #if PROFILING > 0
     "timing", tinfos,

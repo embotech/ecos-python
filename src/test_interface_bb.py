@@ -58,5 +58,5 @@ dims = dict()
 dims['l'] = 4
 
 sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=True, bool_vars_idx=bool_idx)
-
+print(sol)
 print(sol['x'])
