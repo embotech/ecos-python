@@ -644,9 +644,6 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     exitcode = ECOS_solve(mywork);
   }
 
-  printf("\tPCOST: %.2f \n", mywork->info->pcost);
-  printf("\tDCOST: %.2f \n", mywork->info->dcost);
-
   /* create output (all data is *deep copied*) */
   /* TODO: request CVXOPT API for constructing from existing pointer */
   /* x */
