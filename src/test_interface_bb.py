@@ -14,7 +14,7 @@ G = sp.csc_matrix( (array([2.0, 3.0, -1.0, 1.0, 4.0, -1.0]),
 dims = dict()
 dims['l'] = 4
 
-sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=True, int_vars_idx=bool_idx)
+sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
 
 print(sol['x'])
 
@@ -28,7 +28,7 @@ G = sp.csc_matrix( (array([2.0, 3.0, -1.0, 1.0, 4.0, -1.0]),
 dims = dict()
 dims['l'] = 4
 
-sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=True, int_vars_idx=bool_idx)
+sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
 
 print(sol['x'])
 
@@ -42,7 +42,7 @@ G = sp.csc_matrix( (array([2.0, 3.0, -1.0, 1.0, 4.0, -1.0]),
 dims = dict()
 dims['l'] = 4
 
-sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=True, int_vars_idx=bool_idx)
+sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
 
 print(sol['x'])
 

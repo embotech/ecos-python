@@ -282,7 +282,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &opts_ecos.maxit,
       &PyList_Type, &bool_idx,
       &PyList_Type, &int_idx,
-      &PyBool_Type, &opts_ecos_bb.verbose,
+      &PyBool_Type, &mi_verbose,
       &opts_ecos_bb.maxit,
       &opts_ecos_bb.abs_tol_gap,
       &opts_ecos_bb.rel_tol_gap, 
