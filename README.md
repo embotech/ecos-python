@@ -81,7 +81,8 @@ These are the same fields as in the Matlab case. If the fields are omitted or
 empty, they default to 0.
 The argument `kwargs` can include the keywords
 `feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
-`max_iters` for the maximum number of iterations, the Boolean `verbose`, `bool_vars_idx`, a list of `int`s which index the boolean variables, `int_vars_idx`, a list of `int`s which index the integer variables, `integer_tol` for the tolerance for integer numbers, and `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only).
+`max_iters` for the maximum number of iterations, the Boolean `verbose`, `bool_vars_idx`, a list of `int`s which index the boolean variables, `int_vars_idx`, a list of `int`s which index the integer variables, `mi_int_tol` for the tolerance for integer numbers (mixed integer problems only), `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only), `mi_abs_eps` for the absolute tolerance between upper and lower bounds (mixed integer problems only), and `mi_rel_eps` for the relative tolerance, (U-L)/L, between upper and lower bounds (mixed integer problems only).
+
 The arguments `A`, `b`, and `kwargs` are optional.
 
 The returned object is a dictionary containing the fields `solution['x']`, `solution['y']`, `solution['s']`, `solution['z']`, and `solution['info']`.
