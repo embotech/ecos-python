@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/embotech/ecos-python.svg?branch=master)](https://travis-ci.org/embotech/ecos-python)
 [![Build Status](https://ci.appveyor.com/api/projects/status/78aatn417av1ul5u?svg=true)](https://ci.appveyor.com/project/echu/ecos-python)
 
+**Visit www.embotech.com/ECOS for detailed information on ECOS.**
+
 ECOS is a numerical software for solving convex second-order cone
 programs (SOCPs) of type
 ```
@@ -80,8 +82,14 @@ argument `dims` is a dictionary with two fields, `dims['l']` and `dims['q']`.
 These are the same fields as in the Matlab case. If the fields are omitted or
 empty, they default to 0.
 The argument `kwargs` can include the keywords
-`feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
-`max_iters` for the maximum number of iterations, the Boolean `verbose`, `bool_vars_idx`, a list of `int`s which index the boolean variables, `int_vars_idx`, a list of `int`s which index the integer variables, `mi_int_tol` for the tolerance for integer numbers (mixed integer problems only), `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only), `mi_abs_eps` for the absolute tolerance between upper and lower bounds (mixed integer problems only), and `mi_rel_eps` for the relative tolerance, (U-L)/L, between upper and lower bounds (mixed integer problems only).
++ `feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
++ `max_iters` for the maximum number of iterations, 
++ the Boolean `verbose`, 
++ `bool_vars_idx`, a list of `int`s which index the boolean variables, 
++ `int_vars_idx`, a list of `int`s which index the integer variables, 
++ `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only), 
++ `mi_abs_eps` for the absolute tolerance between upper and lower bounds (mixed integer problems only), and 
++ `mi_rel_eps` for the relative tolerance, (U-L)/L, between upper and lower bounds (mixed integer problems only).
 
 The arguments `A`, `b`, and `kwargs` are optional.
 
@@ -117,24 +125,6 @@ v3.0](http://www.gnu.org/copyleft/gpl.html). Other licenses may be
 available upon request from [embotech](http://www.embotech.com).
 
 
-## Features of ECOS
-
-+ *ECOS runs on embedded platforms*. Written in ANSI C (except for the
-  timing code), it can be compiled for any platform for which a C
-  compiler is available. Excluding the problem setup part, no memory
-  manager is needed for solving problem instances of same structure.
-+ *ECOS is efficient*. Using sparse linear algebra routines, it computes
-  only what is really necessary. The interior point algorithm it
-  implements is one of the fastest converging methods that are currently
-  in use for solving convex conic problems.
-+ *ECOS has a tiny footprint*. The ECOS solver consists of 750 lines of
-  C code (excluding the problem setup code).
-+ *ECOS is numerically robust*. Using regularization and iterative
-  refinement coupled with a carefully chosen sparse representation of
-  scaling matrices, millions of problem instances are solved reliably.
-+ *ECOS is library-free*. No need to link any external library to ECOS,
-  apart from `AMD` and `sparseLDL`, both from Timothy A. Davis, which
-  are included in this project.
 
 
 ## Credits
@@ -164,31 +154,3 @@ year={2013},
 pages={3071-3076}
 }
 ```
-
-# Exitcodes
-ECOS defines a number of exitcodes that indicate the quality of the
-returned solution. In general, positive values indicate that the solver
-has converged within the given tolerance. More specifically,
-+ 0: optimal
-+ 1: primal infeasible
-+ 2: dual infeasible
-
-An exact definition of when these flags are returned can be found in
-Alexander Domahidi's [PhD
-Thesis](http://e-collection.library.ethz.ch/view/eth:7611?q=domahidi) in
-Chapter 9.4.2. (pp. 163).
-
-Negative numbers indicate that the problem could not be solved to the
-required accuracy (the returned iterate might still be satisfactory -
-please do check the duality gap etc.)
-+ -1: maximum number of iterations reached
-+ -2: numerical problems (unreliable search direction)
-+ -3: numerical problems (slacks or multipliers became exterior)
-+ -7: unknown problem in solver
-
-It is in general good practice to check the exitcode, in particular when solving optimization problems in an unsupervised, automated fashion (in a batch job, for example). Please report optimization problems for which ECOS struggles to converge to one of the authors.
-
-
-# Extensions
-A branch-and-bound plugin is available for ECOS. (TODO, figure out how
-it works.)
