@@ -664,7 +664,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   veclen[0] = p;
   y = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->y);
 
-  if (bool_idx){
+  if (num_bool > 0 || num_int > 0){
     /* info dict */
     /* infostring */
     switch( exitcode ){
@@ -797,7 +797,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   z = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->z);
 
   /* cleanup */
-  if (bool_idx){
+  if (num_bool > 0 || num_int > 0){
     ECOS_BB_cleanup(myecos_bb_work, 4);
   }else{
     ECOS_cleanup(mywork, 4);
