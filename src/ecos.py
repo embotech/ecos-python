@@ -29,10 +29,11 @@ def solve(c,G,h,dims,A=None,b=None, **kwargs):
         warn("Converting A to a CSC matrix; may take a while.")
         A = A.tocsc()
 
-    if G is None: m,n1 = 0,len(c)
-    else: m,n1 = G.shape
-    if A is None: p,n2 = 0,n1
-    else: p,n2 = A.shape
+    # set the dimensions
+    # note that we forcibly coerce the shape values to Python ints
+    # (C longs) in case of shenanigans with the underlying storage
+    m,n1 = (0,len(c)) if G is None else map(int, G.shape)
+    p,n2 = (0,n1) if A is None else map(int, A.shape)
 
     if n1 != n2:
         raise TypeError("Columns of A and G don't match")
