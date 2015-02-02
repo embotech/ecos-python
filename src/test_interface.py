@@ -34,7 +34,7 @@ except ImportError:
 # global data structures for problem
 c = np.array([-1.])
 h = np.array([4., -0.])
-G = sp.csc_matrix([1., -1.]).T.tocsc()
+G = (sp.csc_matrix([1., -1.]).T).tocsc()
 A = sp.csc_matrix([1.])
 b = np.array([3.])
 dims = {'q': [], 'l': 2}

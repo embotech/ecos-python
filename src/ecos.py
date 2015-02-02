@@ -32,7 +32,7 @@ def solve(c,G,h,dims,A=None,b=None, **kwargs):
     # set the dimensions
     # note that we forcibly coerce the shape values to Python ints
     # (C longs) in case of shenanigans with the underlying storage
-    m,n1 = (0,len(c)) if G is None else map(int, G.shape)
+    m,n1 = (0,len(c)) if G is None else map(int, G.get_shape())
     p,n2 = (0,n1) if A is None else map(int, A.shape)
 
     if n1 != n2:
