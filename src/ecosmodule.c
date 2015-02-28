@@ -215,8 +215,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       "Ax", "Ai", "Ap", "b",
       "verbose", "feastol", "abstol", "reltol",
       "feastol_inacc", "abstol_inacc", "reltol_inacc",
-      "max_iters", "bool_vars_idx", "int_vars_idx", 
-      "mi_verbose", "mi_max_iters", "mi_abs_eps", 
+      "max_iters", "bool_vars_idx", "int_vars_idx",
+      "mi_verbose", "mi_max_iters", "mi_abs_eps",
       "mi_rel_eps", "mi_int_tol", NULL};
   int intType, doubleType;
 
@@ -254,9 +254,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   opts_ecos.maxit = MAXIT;
   opts_ecos.verbose = VERBOSE;
 
-  opts_ecos_bb.verbose = 1;         
+  opts_ecos_bb.verbose = 1;
   opts_ecos_bb.maxit = MI_MAXITER;
-  opts_ecos_bb.abs_tol_gap = MI_ABS_EPS;     
+  opts_ecos_bb.abs_tol_gap = MI_ABS_EPS;
   opts_ecos_bb.rel_tol_gap = MI_REL_EPS;
   opts_ecos_bb.integer_tol = MI_INT_TOL;
 
@@ -285,8 +285,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &PyBool_Type, &mi_verbose,
       &opts_ecos_bb.maxit,
       &opts_ecos_bb.abs_tol_gap,
-      &opts_ecos_bb.rel_tol_gap, 
-      &opts_ecos_bb.integer_tol 
+      &opts_ecos_bb.rel_tol_gap,
+      &opts_ecos_bb.integer_tol
       )
     ) { return NULL; }
 
@@ -614,7 +614,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     /* Solve! */
     exitcode = ECOS_BB_solve(myecos_bb_work);
     mi_iterations =(long) myecos_bb_work->iter;
-    
+
   } else{
     /* This calls ECOS setup function. */
     mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
@@ -654,6 +654,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = n;
   x = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->x);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) x, NPY_ARRAY_OWNDATA);
 
   /* y */
   /* matrix *y;
@@ -663,6 +665,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = p;
   y = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->y);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) y, NPY_ARRAY_OWNDATA);
 
   if (num_bool > 0 || num_int > 0){
     /* info dict */
@@ -786,6 +790,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = m;
   s = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->s);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) s, NPY_ARRAY_OWNDATA);
 
   /* z */
   /* matrix *z;
@@ -795,6 +801,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = m;
   z = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->z);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) z, NPY_ARRAY_OWNDATA);
 
   /* cleanup */
   if (num_bool > 0 || num_int > 0){
