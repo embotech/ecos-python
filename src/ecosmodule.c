@@ -49,8 +49,8 @@ static INLINE PyArrayObject *getContiguous(PyArrayObject *array, int typenum) {
    * the overhead should be small unless the numpy array has been
    * reordered in some way or the data type doesn't quite match
    *
-   * the "new_owner" pointer has to have Py_DECREF called on it; it owns
-   * the "new" array object created by PyArray_Cast
+   * the "tmp_arr" pointer has to have Py_DECREF called on it; new_owner
+   * owns the "new" array object created by PyArray_Cast
    */
   static PyArrayObject *tmp_arr;
   PyArrayObject *new_owner;
@@ -207,7 +207,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   settings opts_ecos;
   settings_bb opts_ecos_bb;
 
-  pwork* mywork;
+  pwork* mywork = NULL;
   ecos_bb_pwork* myecos_bb_work = NULL;
 
   idxint i;
@@ -215,8 +215,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       "Ax", "Ai", "Ap", "b",
       "verbose", "feastol", "abstol", "reltol",
       "feastol_inacc", "abstol_inacc", "reltol_inacc",
-      "max_iters", "bool_vars_idx", "int_vars_idx", 
-      "mi_verbose", "mi_max_iters", "mi_abs_eps", 
+      "max_iters", "bool_vars_idx", "int_vars_idx",
+      "mi_verbose", "mi_max_iters", "mi_abs_eps",
       "mi_rel_eps", "mi_int_tol", NULL};
   int intType, doubleType;
 
@@ -240,7 +240,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   npy_intp veclen[1];
   PyObject *x, *y, *z, *s;
   const char* infostring;
-  PyObject *infoDict, *tinfos;
+  PyObject *infoDict = NULL;
+  PyObject *tinfos = NULL;
   PyObject *returnDict = NULL;
   /* END VARIABLE DECLARATIONS */
 
@@ -254,9 +255,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   opts_ecos.maxit = MAXIT;
   opts_ecos.verbose = VERBOSE;
 
-  opts_ecos_bb.verbose = 1;         
+  opts_ecos_bb.verbose = 1;
   opts_ecos_bb.maxit = MI_MAXITER;
-  opts_ecos_bb.abs_tol_gap = MI_ABS_EPS;     
+  opts_ecos_bb.abs_tol_gap = MI_ABS_EPS;
   opts_ecos_bb.rel_tol_gap = MI_REL_EPS;
   opts_ecos_bb.integer_tol = MI_INT_TOL;
 
@@ -285,8 +286,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &PyBool_Type, &mi_verbose,
       &opts_ecos_bb.maxit,
       &opts_ecos_bb.abs_tol_gap,
-      &opts_ecos_bb.rel_tol_gap, 
-      &opts_ecos_bb.integer_tol 
+      &opts_ecos_bb.rel_tol_gap,
+      &opts_ecos_bb.integer_tol
       )
     ) { return NULL; }
 
@@ -446,6 +447,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
               numConicVariables += q[i];
           } else {
             PyErr_SetString(PyExc_TypeError, "dims['q'] ought to be a list of positive integers");
+            if(q) free(q);
             Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
             Py_DECREF(c_arr); Py_DECREF(h_arr);
             return NULL;
@@ -614,8 +616,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     /* Solve! */
     exitcode = ECOS_BB_solve(myecos_bb_work);
     mi_iterations =(long) myecos_bb_work->iter;
-    
+
   } else{
+
     /* This calls ECOS setup function. */
     mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
     if( mywork == NULL ){
@@ -654,6 +657,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = n;
   x = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->x);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) x, NPY_ARRAY_OWNDATA);
 
   /* y */
   /* matrix *y;
@@ -663,6 +668,30 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    */
   veclen[0] = p;
   y = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->y);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) y, NPY_ARRAY_OWNDATA);
+
+  /* s */
+  /* matrix *s;
+   * if(!(s = Matrix_New(m,1,DOUBLE)))
+   *   return PyErr_NoMemory();
+   * memcpy(MAT_BUFD(s), mywork->s, m*sizeof(double));
+   */
+  veclen[0] = m;
+  s = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->s);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) s, NPY_ARRAY_OWNDATA);
+
+  /* z */
+  /* matrix *z;
+   * if(!(z = Matrix_New(m,1,DOUBLE)))
+   *   return PyErr_NoMemory();
+   * memcpy(MAT_BUFD(z), mywork->z, m*sizeof(double));
+   */
+  veclen[0] = m;
+  z = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->z);
+  /* give memory ownership to numpy array */
+  PyArray_ENABLEFLAGS((PyArrayObject *) z, NPY_ARRAY_OWNDATA);
 
   if (num_bool > 0 || num_int > 0){
     /* info dict */
@@ -729,7 +758,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* timings */
 #if PROFILING > 0
-	tinfos = Py_BuildValue(
+  tinfos = Py_BuildValue(
 #if PROFILING > 1
     "{s:d,s:d,s:d,s:d,s:d,s:d,s:d,s:d}",
 #else
@@ -778,31 +807,6 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   Py_DECREF(tinfos);
 #endif
 
-  /* s */
-  /* matrix *s;
-   * if(!(s = Matrix_New(m,1,DOUBLE)))
-   *   return PyErr_NoMemory();
-   * memcpy(MAT_BUFD(s), mywork->s, m*sizeof(double));
-   */
-  veclen[0] = m;
-  s = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->s);
-
-  /* z */
-  /* matrix *z;
-   * if(!(z = Matrix_New(m,1,DOUBLE)))
-   *   return PyErr_NoMemory();
-   * memcpy(MAT_BUFD(z), mywork->z, m*sizeof(double));
-   */
-  veclen[0] = m;
-  z = PyArray_SimpleNewFromData(1, veclen, NPY_DOUBLE, mywork->z);
-
-  /* cleanup */
-  if (num_bool > 0 || num_int > 0){
-    ECOS_BB_cleanup(myecos_bb_work, 4);
-  }else{
-    ECOS_cleanup(mywork, 4);
-  }
-
   returnDict = Py_BuildValue(
     "{s:O,s:O,s:O,s:O,s:O}",
     "x",x,
@@ -812,6 +816,13 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     "info",infoDict);
   /* give up ownership to the return dictionary */
   Py_DECREF(x); Py_DECREF(y); Py_DECREF(z); Py_DECREF(s); Py_DECREF(infoDict);
+
+  /* cleanup */
+  if (num_bool > 0 || num_int > 0){
+    ECOS_BB_cleanup(myecos_bb_work, 4);
+  } else {
+    ECOS_cleanup(mywork, 4);
+  }
 
   /* no longer need pointers to arrays that held primitives */
   if(q) free(q);
