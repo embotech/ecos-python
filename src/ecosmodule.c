@@ -108,6 +108,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    * `dims` is a dictionary with
    *    `dims['l']` an integer specifying the dimension of positive orthant cone
    *    `dims['q']` an *list* specifying dimensions of second-order cones
+   *    `dims['e']` an integer specifying the number of exponential cones
    *
    * "A" is an optional sparse matrix in column compressed storage. "Ax" are
    * the values, "Ai" are the rows, and "Ap" are the column pointers.
@@ -183,6 +184,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   /* ECOS data structures */
   idxint l = 0;
   idxint *q = NULL;
+  idxint e = 0;
 
   pfloat *Gpr = NULL;
   idxint *Gjc = NULL;
@@ -231,6 +233,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   PyArrayObject *h_arr;
   PyObject *linearObj;
   PyObject *socObj;
+  PyObject *expObj;
   PyArrayObject *Ax_arr = NULL;
   PyArrayObject *Ai_arr = NULL;
   PyArrayObject *Ap_arr = NULL;
@@ -461,6 +464,22 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       return NULL;
     }
   }
+  
+  
+  /* get dims['e'] */
+  expObj = PyDict_GetItemString(dims, "e");
+  if(expObj) {
+    if ( (PyInt_Check(expObj) && ((e = (idxint) PyInt_AsLong(expObj)) >= 0)) ||
+         (PyLong_Check(expObj) && ((e = PyLong_AsLong(expObj)) >= 0)) ){
+        numConicVariables += e;
+    } else {
+      PyErr_SetString(PyExc_TypeError, "dims['e'] ought to be a nonnegative integer");
+      Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
+      Py_DECREF(c_arr); Py_DECREF(h_arr);
+      return NULL;
+    }
+  }
+  
 
   if(Ax && Ai && Ap && b) {
     /* set A */
@@ -586,7 +605,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     }
 
     /* This calls ECOS setup function. */
-    myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir,
+    myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, e, Gpr, Gjc, Gir,
       Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx, &opts_ecos_bb);
     if( myecos_bb_work == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS_BB while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
@@ -620,7 +639,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   } else{
 
     /* This calls ECOS setup function. */
-    mywork = ECOS_setup(n, m, p, l, ncones, q, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
+    mywork = ECOS_setup(n, m, p, l, ncones, q, e, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
     if( mywork == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
         if(q) free(q);

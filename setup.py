@@ -26,17 +26,27 @@ _ecos = Extension('_ecos', libraries = lib,
                         'ecos/external/ldl/include',
                         'ecos/external/SuiteSparse_config'],
                     sources = ['src/ecosmodule.c',
-                        'ecos/external/ldl/src/ldl.c'
+                        'ecos/external/ldl/src/ldl.c',
+                        'ecos/src/cone.c',
+                        'ecos/src/ctrlc.c',
+                        'ecos/src/ecos.c',
+                        'ecos/src/equil.c',
+                        'ecos/src/expcone.c',
+                        'ecos/src/kkt.c',
+                        'ecos/src/preproc.c',
+                        'ecos/src/spla.c',
+                        'ecos/src/splamm.c',
+                        'ecos/src/timer.c',
+                        'ecos/src/wright_omega.c'
                     ] + glob('ecos/external/amd/src/*.c')
-                      + glob('ecos/src/*.c')            # glob source files
                       + glob('ecos/ecos_bb/*.c'))       # glob bb source files
 
 setup(
     name = 'ecos',
-    version = '1.1.1',  # read from ecos submodule
+    version = '2.0.0',  # read from ecos submodule
     # point to README.md file instead of plain-text readme
-    author = 'Alexander Domahidi, Eric Chu, Han Wang',
-    author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu',
+    author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
+    author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
     url = 'http://github.com/embotech/ecos',
     description = 'This is the Python package for ECOS: Embedded Cone Solver. See Github page for more information.',
     license = "GPLv3",
