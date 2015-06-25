@@ -471,7 +471,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if(expObj) {
     if ( (PyInt_Check(expObj) && ((e = (idxint) PyInt_AsLong(expObj)) >= 0)) ||
          (PyLong_Check(expObj) && ((e = PyLong_AsLong(expObj)) >= 0)) ){
-        numConicVariables += e;
+        numConicVariables += 3*e;
     } else {
       PyErr_SetString(PyExc_TypeError, "dims['e'] ought to be a nonnegative integer");
       Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
@@ -582,7 +582,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* check that sum(q) + l = m */
   if( numConicVariables != m ){
-      PyErr_SetString(PyExc_ValueError, "Number of rows of G does not match dims.l+sum(dims.q)");
+      PyErr_SetString(PyExc_ValueError, "Number of rows of G does not match dims.l+sum(dims.q)+dims.e");
       if (q) free(q);
       Py_DECREF(Gx_arr); Py_DECREF(Gi_arr); Py_DECREF(Gp_arr);
       Py_DECREF(c_arr); Py_DECREF(h_arr);
