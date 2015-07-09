@@ -6,10 +6,10 @@ $MINICONDA_URL = "http://repo.continuum.io/miniconda/"
 
 function DownloadMiniconda ($python_version, $platform_suffix) {
     $webclient = New-Object System.Net.WebClient
-    if ($python_version -eq "3.4") {
-        $filename = "Miniconda3-3.5.5-Windows-" + $platform_suffix + ".exe"
+    if ($python_version -eq "3.4.x") {
+        $filename = "Miniconda3-latest-Windows-" + $platform_suffix + ".exe"
     } else {
-        $filename = "Miniconda-3.5.5-Windows-" + $platform_suffix + ".exe"
+        $filename = "Miniconda-latest-Windows-" + $platform_suffix + ".exe"
     }
     $url = $MINICONDA_URL + $filename
 
@@ -87,7 +87,7 @@ function UpdateConda ($python_home) {
 function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
-    InstallCondaPackages $env:PYTHON "conda-build=1.4.0 pip jinja2"
+    InstallCondaPackages $env:PYTHON "conda-build pip jinja2"
 }
 
 main
