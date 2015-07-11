@@ -441,7 +441,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   socObj = PyDict_GetItemString(dims, "q");
   if(socObj) {
     if (PyList_Check(socObj)) {
-      ncones = PyList_Size(socObj);
+      ncones = (idxint)PyList_Size(socObj);
       q = calloc(ncones, sizeof(idxint));
       for (i = 0; i < ncones; ++i) {
           PyObject *qi = PyList_GetItem(socObj, i);
