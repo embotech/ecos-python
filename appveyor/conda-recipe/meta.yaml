@@ -14,18 +14,17 @@ requirements:
     - python
     - numpy
     - scipy
-# skip tests until we can figure out what happened with 64bit windows
-# test:
-#     files:
-#       - ..\..\src\test_interface.py
-#       - ..\..\src\test_interface_bb.py
-#     requires:
-#       - nose
-#     imports:
-#       - ecos
-#     commands:
-#       - nosetests --nocapture test_interface.py
-#       - nosetests --nocapture test_interface_bb.py
+test:
+    files:
+      - ..\..\src\test_interface.py
+      - ..\..\src\test_interface_bb.py
+    requires:
+      - nose
+    imports:
+      - ecos
+    commands:
+      - nosetests --nocapture test_interface.py
+      - nosetests --nocapture test_interface_bb.py
 about:
   home: https://github.com/embotech/ecos-python
   license: GPLv3
