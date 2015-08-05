@@ -43,7 +43,7 @@ _ecos = Extension('_ecos', libraries = lib,
 
 setup(
     name = 'ecos',
-    version = '2.0.1',  # read from ecos submodule
+    version = '2.0.2',  # read from ecos submodule
     # point to README.md file instead of plain-text readme
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
