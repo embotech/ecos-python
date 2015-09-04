@@ -52,7 +52,7 @@ static INLINE PyArrayObject *getContiguous(PyArrayObject *array, int typenum) {
    * the "tmp_arr" pointer has to have Py_DECREF called on it; new_owner
    * owns the "new" array object created by PyArray_Cast
    */
-  static PyArrayObject *tmp_arr;
+  PyArrayObject *tmp_arr;
   PyArrayObject *new_owner;
   tmp_arr = PyArray_GETCONTIGUOUS(array);
   new_owner = (PyArrayObject *) PyArray_Cast(tmp_arr, typenum);
