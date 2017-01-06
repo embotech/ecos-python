@@ -7,7 +7,11 @@ except ImportError:
 
 from glob import glob
 from platform import system
-import numpy
+try:
+    import numpy
+except ImportError:
+    print("Please install numpy first, `pip install numpy`.")
+    raise
 
 lib = []
 if system() == 'Linux':
