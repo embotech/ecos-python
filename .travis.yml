@@ -9,7 +9,7 @@ python:
 virtualenv:
     system_site_packages: true
 # install scipy and numpy for python2 and python3
-before_install
+before_install:
     - sudo apt-key update
     - sudo apt-get update -q
     - sudo apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy dist-upgrade
