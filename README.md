@@ -64,7 +64,7 @@ If using a newer version of Python, you can use a newer version of
 Visual Studio. For instance, Python 3.3 is built against [Visual Studio
 2010](http://go.microsoft.com/?linkid=9709949).
 
-##Calling ECOS from Python
+## Calling ECOS from Python
 
 After installing the ECOS interface, you must import the module with
 ```
@@ -83,12 +83,12 @@ These are the same fields as in the Matlab case. If the fields are omitted or
 empty, they default to 0.
 The argument `kwargs` can include the keywords
 + `feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
-+ `max_iters` for the maximum number of iterations, 
-+ the Boolean `verbose`, 
-+ `bool_vars_idx`, a list of `int`s which index the boolean variables, 
-+ `int_vars_idx`, a list of `int`s which index the integer variables, 
-+ `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only), 
-+ `mi_abs_eps` for the absolute tolerance between upper and lower bounds (mixed integer problems only), and 
++ `max_iters` for the maximum number of iterations,
++ the Boolean `verbose`,
++ `bool_vars_idx`, a list of `int`s which index the boolean variables,
++ `int_vars_idx`, a list of `int`s which index the integer variables,
++ `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only),
++ `mi_abs_eps` for the absolute tolerance between upper and lower bounds (mixed integer problems only), and
 + `mi_rel_eps` for the relative tolerance, (U-L)/L, between upper and lower bounds (mixed integer problems only).
 
 The arguments `A`, `b`, and `kwargs` are optional.
