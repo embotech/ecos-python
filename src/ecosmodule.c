@@ -124,6 +124,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    *     `abstol_inacc`: the absolute tolerance on the duality gap if reduced precision
    *     `reltolL_inacc`: the relative tolerance on the duality gap if reduced precision
    *     `max_iters`: the maximum numer of iterations.
+   *     `nitref`: the number of iterative refinement steps.
    *     `verbose`: signals to print on non zero value.
    *
    * This call will solve the problem
@@ -217,16 +218,16 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       "Ax", "Ai", "Ap", "b",
       "verbose", "feastol", "abstol", "reltol",
       "feastol_inacc", "abstol_inacc", "reltol_inacc",
-      "max_iters", "bool_vars_idx", "int_vars_idx",
+      "max_iters", "nitref", "bool_vars_idx", "int_vars_idx",
       "mi_verbose", "mi_max_iters", "mi_abs_eps",
       "mi_rel_eps", "mi_int_tol", NULL};
   int intType, doubleType;
 
   /* parse the arguments and ensure they are the correct type */
 #ifdef DLONG
-  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddlO!O!O!lddd";
+  static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddllO!O!O!lddd";
 #else
-  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiO!O!O!iddd";
+  static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiiO!O!O!iddd";
 #endif
   PyArrayObject *Gx_arr, *Gi_arr, *Gp_arr;
   PyArrayObject *c_arr;
@@ -256,6 +257,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   opts_ecos.abstol_inacc = ATOL_INACC;
   opts_ecos.reltol_inacc = RTOL_INACC;
   opts_ecos.maxit = MAXIT;
+  opts_ecos.nitref = NITREF;
   opts_ecos.verbose = VERBOSE;
 
   opts_ecos_bb.verbose = 1;
@@ -284,6 +286,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       &opts_ecos.abstol_inacc,
       &opts_ecos.reltol_inacc,
       &opts_ecos.maxit,
+      &opts_ecos.nitref,
       &PyList_Type, &bool_idx,
       &PyList_Type, &int_idx,
       &PyBool_Type, &mi_verbose,
@@ -352,6 +355,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   if (verbose)
       opts_ecos.verbose = (idxint) PyObject_IsTrue(verbose);
   if (checkNonnegativeInt("maxit", opts_ecos.maxit) < 0) return NULL;
+  if (checkNonnegativeInt("nitref", opts_ecos.nitref) < 0) return NULL;
   if (checkPositiveFloat("abstol", opts_ecos.abstol) < 0) return NULL;
   if (checkPositiveFloat("feastol", opts_ecos.feastol) < 0) return NULL;
   if (checkPositiveFloat("reltol", opts_ecos.reltol) < 0) return NULL;
@@ -631,6 +635,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     mywork->stgs->feastol_inacc = opts_ecos.feastol_inacc;
     mywork->stgs->reltol_inacc = opts_ecos.reltol_inacc;
     mywork->stgs->maxit = opts_ecos.maxit;
+    mywork->stgs->nitref = opts_ecos.nitref;
 
     /* Solve! */
     exitcode = ECOS_BB_solve(myecos_bb_work);
@@ -661,6 +666,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     mywork->stgs->feastol_inacc = opts_ecos.feastol_inacc;
     mywork->stgs->reltol_inacc = opts_ecos.reltol_inacc;
     mywork->stgs->maxit = opts_ecos.maxit;
+    mywork->stgs->nitref = opts_ecos.nitref;
 
     /* Solve! */
     exitcode = ECOS_solve(mywork);
