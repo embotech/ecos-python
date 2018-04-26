@@ -1,9 +1,9 @@
 language: python
-# using system site packages only works with 2.7 and 3.2
+# using system site packages only works with 2.7 and 3.4
 python:
     # - "2.6"
     - "2.7"
-    - "3.2"
+    - "3.4"
     # - "3.3"
     # - "3.4"
 virtualenv:
