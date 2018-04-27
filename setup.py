@@ -1,17 +1,13 @@
 from __future__ import print_function
 try:
     from setuptools import setup, Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
 except ImportError:
     print("Please use pip (https://pypi.python.org/pypi/pip) to install.")
     raise
 
 from glob import glob
 from platform import system
-try:
-    import numpy
-except ImportError:
-    print("Please install numpy first, `pip install numpy`.")
-    raise
 
 lib = []
 if system() == 'Linux':
@@ -25,7 +21,7 @@ _ecos = Extension('_ecos', libraries = lib,
                         ('DLONG', None),
                         ('LDL_LONG', None),
                         ('CTRLC', 1)],
-                    include_dirs = ['ecos/include', numpy.get_include(),
+                    include_dirs = ['ecos/include',
                         'ecos/external/amd/include',
                         'ecos/external/ldl/include',
                         'ecos/external/SuiteSparse_config'],
@@ -45,6 +41,18 @@ _ecos = Extension('_ecos', libraries = lib,
                     ] + glob('ecos/external/amd/src/*.c')
                       + glob('ecos/ecos_bb/*.c'))       # glob bb source files
 
+class build_ext(_build_ext):
+    """ This custom class for building extensions exists so we can force
+    a numpy install before building the extension, thereby giving us
+    access to the numpy headers.
+    """
+    def finalize_options(self):
+        _build_ext.finalize_options(self)
+        # Prevent numpy from thinking it is still in its setup process:
+        __builtins__.__NUMPY_SETUP__ = False
+        import numpy
+        self.include_dirs.append(numpy.get_include())
+
 setup(
     name = 'ecos',
     version = '2.0.7rc1',  # read from ecos submodule
@@ -55,8 +63,12 @@ setup(
     description = 'This is the Python package for ECOS: Embedded Cone Solver. See Github page for more information.',
     license = "GPLv3",
     package_dir = {'': 'src'},
+    cmdclass = {'build_ext': build_ext},
     py_modules = ['ecos'],
     ext_modules = [_ecos],
+    setup_requires = [
+        "numpy >= 1.6"
+    ],
     install_requires = [
         "numpy >= 1.6",
         "scipy >= 0.9"
