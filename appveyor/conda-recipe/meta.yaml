@@ -15,16 +15,16 @@ requirements:
     - numpy
     - scipy
 test:
-    files:
-      - ..\..\src\test_interface.py
-      - ..\..\src\test_interface_bb.py
-    requires:
-      - nose
-    imports:
-      - ecos
-    commands:
-      - nosetests --nocapture test_interface.py
-      - nosetests --nocapture test_interface_bb.py
+  source_files:
+    - src/test_interface.py
+    - src/test_interface_bb.py
+  requires:
+    - nose
+  imports:
+    - ecos
+  commands:
+    - nosetests --nocapture src/test_interface.py
+    - nosetests --nocapture src/test_interface_bb.py
 about:
   home: https://github.com/embotech/ecos-python
   license: GPLv3
