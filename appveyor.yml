@@ -26,8 +26,8 @@ install:
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
-  # install needd dependencies
-  - "%PYTHON%\\python.exe -m pip install wheel"
+  # install needed dependencies, and pre-install numpy, scipy
+  - "%PYTHON%\\python.exe -m pip install wheel numpy scipy"
 
 build: false  # Not a C# project, build stuff at the test step instead.
 
