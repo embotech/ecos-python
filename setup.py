@@ -72,5 +72,7 @@ setup(
     install_requires = [
         "numpy >= 1.6",
         "scipy >= 0.9"
-    ]
+    ],
+    test_suite='nose.collector',
+    tests_require=['nose']
 )
