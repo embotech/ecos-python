@@ -225,7 +225,12 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
 
   /* parse the arguments and ensure they are the correct type */
 #ifdef DLONG
+#ifdef _WIN64
+  // use long long on win64
+  static char *argparse_string = "(LLL)O!O!O!O!O!O!|O!O!O!O!O!ddddddLLO!O!O!Lddd";
+#else
   static char *argparse_string = "(lll)O!O!O!O!O!O!|O!O!O!O!O!ddddddllO!O!O!lddd";
+#endif
 #else
   static char *argparse_string = "(iii)O!O!O!O!O!O!|O!O!O!O!O!ddddddiiO!O!O!iddd";
 #endif
