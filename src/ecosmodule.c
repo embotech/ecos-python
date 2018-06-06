@@ -126,6 +126,14 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
    *     `max_iters`: the maximum numer of iterations.
    *     `nitref`: the number of iterative refinement steps.
    *     `verbose`: signals to print on non zero value.
+   *     `mi_max_iters`: maximum number of branch and bound iterations
+   *        (mixed integer problems only),
+   *     `mi_abs_eps`: the absolute tolerance between upper and lower
+   *        bounds (mixed integer problems only),
+   *     `mi_rel_eps`: the relative tolerance, (U-L)/L, between upper
+   *        and lower bounds (mixed integer problems only).
+   *     `mi_verbose`: whether to be verbose when solving mixed integer
+   *        problems
    *
    * This call will solve the problem
    *
@@ -473,8 +481,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       return NULL;
     }
   }
-  
-  
+
+
   /* get dims['e'] */
   expObj = PyDict_GetItemString(dims, "e");
   if(expObj) {
@@ -488,7 +496,7 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
       return NULL;
     }
   }
-  
+
 
   if(Ax && Ai && Ap && b) {
     /* set A */
