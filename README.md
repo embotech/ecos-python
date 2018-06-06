@@ -84,7 +84,7 @@ empty, they default to 0.
 The argument `kwargs` can include the keywords
 + `feastol`, `abstol`, `reltol`, `feastol_inacc`, `abstol_innac`, and `reltol_inacc` for tolerance values,
 + `max_iters` for the maximum number of iterations,
-+ the Boolean `verbose`,
++ the Booleans `verbose` and `mi_verbose`,
 + `bool_vars_idx`, a list of `int`s which index the boolean variables,
 + `int_vars_idx`, a list of `int`s which index the integer variables,
 + `mi_max_iters` for maximum number of branch and bound iterations (mixed integer problems only),
