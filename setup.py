@@ -7,17 +7,23 @@ except ImportError:
 
 from glob import glob
 from platform import system
-try:
-    import numpy
-except ImportError:
-    print("Please install numpy first, `pip install numpy`.")
-    raise
 
 lib = []
 if system() == 'Linux':
     lib += ['rt']
 
-_ecos = Extension('_ecos', libraries = lib,
+class CustomExtension(Extension, object):
+    def __getattribute__(self, attr):
+        if attr == "include_dirs":
+            import numpy
+            return  ['ecos/include', numpy.get_include(),
+                     'ecos/external/amd/include',
+                     'ecos/external/ldl/include',
+                     'ecos/external/SuiteSparse_config']
+        else:
+            return super(CustomExtension, self).__getattribute__(attr)
+
+_ecos = CustomExtension('_ecos', libraries = lib,
                     # define LDL and AMD to use long ints
                     # also define that we are building a python module
                     define_macros = [
@@ -25,10 +31,6 @@ _ecos = Extension('_ecos', libraries = lib,
                         ('DLONG', None),
                         ('LDL_LONG', None),
                         ('CTRLC', 1)],
-                    include_dirs = ['ecos/include', numpy.get_include(),
-                        'ecos/external/amd/include',
-                        'ecos/external/ldl/include',
-                        'ecos/external/SuiteSparse_config'],
                     sources = ['src/ecosmodule.c',
                         'ecos/external/ldl/src/ldl.c',
                         'ecos/src/cone.c',
@@ -57,6 +59,9 @@ setup(
     package_dir = {'': 'src'},
     py_modules = ['ecos'],
     ext_modules = [_ecos],
+    setup_requires = [
+        "numpy >= 1.6",
+    ],
     install_requires = [
         "numpy >= 1.6",
         "scipy >= 0.9"
