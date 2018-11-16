@@ -59,9 +59,19 @@ class build_ext(_build_ext):
         import numpy
         self.include_dirs.append(numpy.get_include())
 
+try:
+    # execute the version file in src/ecos/version.py
+    version = {}
+    with open("src/ecos/version.py") as fp:
+        exec(fp.read(), version)
+except Exception as e:
+    print("Please run `make version` before running setup.py.")
+    raise e
+
+
 setup(
     name = 'ecos',
-    version = '2.0.7rc2',  # read from ecos submodule
+    version = version['__version__'],
     # point to README.md file instead of plain-text readme
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
