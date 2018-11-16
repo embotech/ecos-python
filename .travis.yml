@@ -1,20 +1,21 @@
-language: python
-# using system site packages only works with 2.7 and 3.4
-python:
-    # - "2.6"
-    - "2.7"
-    - "3.4"
-    # - "3.3"
-    # - "3.4"
-virtualenv:
-    system_site_packages: true
-# install scipy and numpy for python2 and python3
-before_install:
-    - sudo apt-get update
-    - sudo apt-get install python-numpy python-scipy python3-numpy python3-scipy
-    - pip install coverage
-# install dependencies
-    - pip install -e .
-# command to run tests
+notifications:
+  email: false
+
+matrix:
+  include:
+    - sudo: required
+      services:
+        - docker
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
+    - sudo: required
+      services:
+        - docker
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
+           PRE_CMD=linux32
+
+install:
+  - docker pull $DOCKER_IMAGE
+
 script:
-    - nosetests --with-cover --cover-package=ecos src/test_interface.py src/test_interface_bb.py
+  - docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh
+  - ls wheelhouse/
