@@ -4,6 +4,17 @@
 notifications:
   email: false
 
+deploy:
+  provider: releases
+  api_key:
+    secure: EOGvA7WTRss3MYJiZWQI29FxHjuKZgteBzdBk7ZJW5a7VmjTVJMBbAD/EnDC2rRrtkhJ+8dtDpnA6y49bsktRnj3c+//SYryVgVu+gRuZRenRR9tAHiXNTylZ9+e1pJVUBwDLdaLuF1gmpQYYvzf5AGYLWSifhn+L3qytfBxj8w=
+  file_glob: true
+  file: wheelhouse/ecos-*.whl
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+
 matrix:
   include:
     - sudo: required
