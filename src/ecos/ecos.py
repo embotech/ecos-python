@@ -3,7 +3,7 @@ from warnings import warn
 import numpy as np
 from scipy import sparse
 
-__version__ = _ecos.version()
+__solver_version__ = _ecos.version()
 
 def solve(c,G,h,dims,A=None,b=None, **kwargs):
     """ This Python routine "unpacks" scipy sparse matrices G and A into the
