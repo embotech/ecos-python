@@ -53,5 +53,4 @@ deploy:
     secure: xJkbMnyaWoKo0ttfZh5Wx3uBYU5/SDYJvQcMWJABKJ3DURaB4oySImDVDR73s+Op
   artifact: /.*\.whl/
   on:
-    branch: master
     appveyor_repo_tag: true
