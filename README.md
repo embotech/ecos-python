@@ -36,10 +36,10 @@ This will download the relevant wheel for your machine.
 If you are attempting to build the Python extension from source, then
 use
 
-    python setup.py install
+    make install
 
-The `distribute.sh` script is used to submit ECOS to the PyPi
-repository. Normal users can ignore it.
+This will use the latest tag on git to version your local installation
+of ECOS.
 
 You will need [Numpy](http://www.numpy.org/)
 and [Scipy](http://www.scipy.org/). For installation instructions, see
@@ -117,6 +117,19 @@ prob = Problem(obj, constraints)
 prob.solve(solver=ECOS)
 print "optimal value with ECOS:", prob.value
 ```
+
+## ECOS Versioning
+The Python module contains two version numbers:
+
+1. `ecos.__version__`: This is the version of the Python wrapper for
+   ECOS
+2. `ecos__solver_version__`: This is the version of the underlying ECOS
+   solver
+
+These two version numbers should typically agree, but they might not
+when a bug in the Python module has been fixed and nothing in the
+underlying C solver has changed. The major version numbers should agree,
+however.
 
 ## License
 

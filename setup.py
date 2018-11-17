@@ -1,17 +1,14 @@
 from __future__ import print_function
 try:
     from setuptools import setup, Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
 except ImportError:
     print("Please use pip (https://pypi.python.org/pypi/pip) to install.")
     raise
 
+import os
 from glob import glob
 from platform import system
-try:
-    import numpy
-except ImportError:
-    print("Please install numpy first, `pip install numpy`.")
-    raise
 
 lib = []
 if system() == 'Linux':
@@ -25,7 +22,7 @@ _ecos = Extension('_ecos', libraries = lib,
                         ('DLONG', None),
                         ('LDL_LONG', None),
                         ('CTRLC', 1)],
-                    include_dirs = ['ecos/include', numpy.get_include(),
+                    include_dirs = ['ecos/include',
                         'ecos/external/amd/include',
                         'ecos/external/ldl/include',
                         'ecos/external/SuiteSparse_config'],
@@ -45,20 +42,54 @@ _ecos = Extension('_ecos', libraries = lib,
                     ] + glob('ecos/external/amd/src/*.c')
                       + glob('ecos/ecos_bb/*.c'))       # glob bb source files
 
+def set_builtin(name, value):
+    if isinstance(__builtins__, dict):
+        __builtins__[name] = value
+    else:
+        setattr(__builtins__, name, value)
+
+class build_ext(_build_ext):
+    """ This custom class for building extensions exists so we can force
+    a numpy install before building the extension, thereby giving us
+    access to the numpy headers.
+    """
+    def finalize_options(self):
+        _build_ext.finalize_options(self)
+        # Prevent numpy from thinking it is still in its setup process:
+        set_builtin("__NUMPY_SETUP__", False)
+        import numpy
+        self.include_dirs.append(numpy.get_include())
+
+try:
+    # execute the version file in src/ecos/version.py
+    version = {}
+    with open(os.path.join("src", "ecos", "version.py")) as fp:
+        exec(fp.read(), version)
+except Exception as e:
+    print("Please run `make version` before running setup.py.")
+    raise e
+
+
 setup(
     name = 'ecos',
-    version = '2.0.5',  # read from ecos submodule
+    version = version['__version__'],
     # point to README.md file instead of plain-text readme
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
     url = 'http://github.com/embotech/ecos',
     description = 'This is the Python package for ECOS: Embedded Cone Solver. See Github page for more information.',
     license = "GPLv3",
+    packages = ['ecos'],
     package_dir = {'': 'src'},
-    py_modules = ['ecos'],
+    cmdclass = {'build_ext': build_ext},
     ext_modules = [_ecos],
+    setup_requires = [
+        "numpy >= 1.6"
+    ],
     install_requires = [
         "numpy >= 1.6",
         "scipy >= 0.9"
-    ]
+    ],
+    test_suite='nose.collector',
+    tests_require=['nose']
 )
