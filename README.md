@@ -131,6 +131,17 @@ when a bug in the Python module has been fixed and nothing in the
 underlying C solver has changed. The major version numbers should agree,
 however.
 
+### What happened to 2.0.7?
+Because version-syncing ECOS and ECOS-Python can be tricky, the 2.0.7
+version did not incorporate some minor changes to ECOS. In an
+ill-advised move, the release was deleted in hopes it could be
+re-uploaded, despite plenty warnings stating otherwise.
+
+Instead, a post release has been made that contains identical content to
+the 2.0.7 release. Generally, `pip` should pick up the post release for
+2.0.7 and any dependencies such as `pip install "ecos>=2.0.5"` should still
+work as expected.
+
 ## License
 
 ECOS is distributed under the [GNU General Public License
