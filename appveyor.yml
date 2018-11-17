@@ -46,6 +46,12 @@ artifacts:
   # Archive the generated wheel package in the ci.appveyor.com build report.
   - path: 'dist\*'
 
-#on_success:
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse
-#
+deploy:
+  provider: GitHub
+  description: ''
+  auth_token:
+    secure: xJkbMnyaWoKo0ttfZh5Wx3uBYU5/SDYJvQcMWJABKJ3DURaB4oySImDVDR73s+Op
+  artifact: /.*\.whl/
+  on:
+    branch: master
+    appveyor_repo_tag: true
