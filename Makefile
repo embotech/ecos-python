@@ -22,6 +22,13 @@ install: version
 	pip install .
 
 release:
+	-rm -rf dist
+	mkdir -p dist
+	curl -s https://api.github.com/repos/embotech/ecos-python/releases/tags/$(TAG) \
+		| grep browser_download_url.*whl \
+		| cut -d : -f 2,3 \
+		| tr -d \" \
+		| wget -P dist -qi -
 	twine upload dist/*
 
 clean:
