@@ -6,6 +6,7 @@ except ImportError:
     print("Please use pip (https://pypi.python.org/pypi/pip) to install.")
     raise
 
+import os
 from glob import glob
 from platform import system
 
@@ -62,7 +63,7 @@ class build_ext(_build_ext):
 try:
     # execute the version file in src/ecos/version.py
     version = {}
-    with open("src/ecos/version.py") as fp:
+    with open(os.path.join("src", "ecos", "version.py")) as fp:
         exec(fp.read(), version)
 except Exception as e:
     print("Please run `make version` before running setup.py.")
