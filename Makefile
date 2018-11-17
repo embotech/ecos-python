@@ -21,9 +21,10 @@ src/ecos/version.py: version
 install: version
 	pip install .
 
-release:
+release: version
 	-rm -rf dist
 	mkdir -p dist
+	python setup.py sdist
 	curl -s https://api.github.com/repos/embotech/ecos-python/releases/tags/$(TAG) \
 		| grep browser_download_url.*whl \
 		| cut -d : -f 2,3 \
