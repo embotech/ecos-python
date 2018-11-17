@@ -11,15 +11,19 @@ for PYBIN in /opt/python/*/bin; do
 done
 
 # Bundle external shared libraries into the wheels
-#for whl in wheelhouse/ecos-*.whl; do
-#   auditwheel repair "$whl" -w /io/wheelhouse/
-#done
+for whl in wheelhouse/ecos-*.whl; do
+   auditwheel repair "$whl" -w /io/wheelhouse/
+done
 
 # Move remaining wheels (numpy, scipy) into location
-mkdir -p /io/wheelhouse
-for whl in wheelhouse/*.whl; do
+for whl in wheelhouse/numpy*.whl; do
     mv $whl /io/$whl
 done
+
+for whl in wheelhouse/scipy*.whl; do
+    mv $whl /io/$whl
+done
+
 
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
