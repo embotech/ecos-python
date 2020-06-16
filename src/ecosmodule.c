@@ -622,8 +622,10 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     }
 
     /* This calls ECOS setup function. */
+    Py_BEGIN_ALLOW_THREADS;
     myecos_bb_work = ECOS_BB_setup(n, m, p, l, ncones, q, e, Gpr, Gjc, Gir,
       Apr, Ajc, Air, cpr, hpr, bpr, num_bool, bool_vars_idx, num_int, int_vars_idx, &opts_ecos_bb);
+    Py_END_ALLOW_THREADS;
     if( myecos_bb_work == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS_BB while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
         if(q) free(q);
@@ -651,13 +653,17 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     mywork->stgs->nitref = opts_ecos.nitref;
 
     /* Solve! */
+    Py_BEGIN_ALLOW_THREADS;
     exitcode = ECOS_BB_solve(myecos_bb_work);
+    Py_END_ALLOW_THREADS;
     mi_iterations =(long) myecos_bb_work->iter;
 
   } else{
 
     /* This calls ECOS setup function. */
+    Py_BEGIN_ALLOW_THREADS;
     mywork = ECOS_setup(n, m, p, l, ncones, q, e, Gpr, Gjc, Gir, Apr, Ajc, Air, cpr, hpr, bpr);
+    Py_END_ALLOW_THREADS;
     if( mywork == NULL ){
         PyErr_SetString(PyExc_RuntimeError, "Internal problem occurred in ECOS while setting up the problem.\nPlease send a bug report with data to Alexander Domahidi.\nEmail: domahidi@control.ee.ethz.ch");
         if(q) free(q);
@@ -682,7 +688,9 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
     mywork->stgs->nitref = opts_ecos.nitref;
 
     /* Solve! */
+    Py_BEGIN_ALLOW_THREADS;
     exitcode = ECOS_solve(mywork);
+    Py_END_ALLOW_THREADS;
   }
 
   /* create output (all data is *deep copied*) */
