@@ -4,6 +4,8 @@
 notifications:
   email: false
 
+sudo: required
+
 deploy:
   provider: releases
   api_key:
