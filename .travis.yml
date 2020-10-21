@@ -20,18 +20,16 @@ matrix:
     - sudo: required
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64 CIBW_SKIP=cp39-*
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
     - sudo: required
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686 CIBW_SKIP=cp39-*
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
            PRE_CMD=linux32
     - os: osx
       env: PYTHON=python2
-      sudo: required
     - os: osx
-      env: PYTHON=python3 CIBW_SKIP=cp39-*
-      sudo: required
+      env: PYTHON=python3
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull $DOCKER_IMAGE; fi

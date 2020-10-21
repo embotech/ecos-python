@@ -6,8 +6,11 @@ set -e -x
 
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
-    "${PYBIN}/pip" install nose coverage #-r /io/dev-requirements.txt
-    "${PYBIN}/pip" wheel /io/ -w wheelhouse/
+    # Skip Python 3.9 because no numpy and scipy wheels yet
+    if [! grep -q "cp39"]; then
+      "${PYBIN}/pip" install nose coverage #-r /io/dev-requirements.txt
+      "${PYBIN}/pip" wheel /io/ -w wheelhouse/
+    fi
 done
 
 # Bundle external shared libraries into the wheels
