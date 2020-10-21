@@ -7,7 +7,7 @@ set -e -x
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
     # Skip Python 3.9 because no numpy and scipy wheels yet
-    if [! echo "$PYBIN" | grep -q "cp39"]; then
+    if ! echo "$PYBIN" | grep -q "cp39"; then
       "${PYBIN}/pip" install nose coverage #-r /io/dev-requirements.txt
       "${PYBIN}/pip" wheel /io/ -w wheelhouse/
     fi
