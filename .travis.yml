@@ -28,8 +28,10 @@ matrix:
            PRE_CMD=linux32
     - os: osx
       env: PYTHON=python2
+      language: python
     - os: osx
       env: PYTHON=python3
+      language: python
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull $DOCKER_IMAGE; fi
