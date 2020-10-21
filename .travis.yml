@@ -15,14 +15,12 @@ deploy:
     branch: master
     tags: true
 
-CIBW_SKIP: cp39-*
-
 matrix:
   include:
     - sudo: required
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64 PYTHON=python36
     - sudo: required
       services:
         - docker
@@ -30,8 +28,10 @@ matrix:
            PRE_CMD=linux32
     - os: osx
       env: PYTHON=python2
+      sudo: required
     - os: osx
       env: PYTHON=python3
+      sudo: required
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull $DOCKER_IMAGE; fi
