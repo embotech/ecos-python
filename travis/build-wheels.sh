@@ -30,6 +30,6 @@ done
 
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
-    "${PYBIN}/pip" install ecos --no-index -f /io/wheelhouse
+    "${PYBIN}/pip" install ecos --no-index --find-links=/io/wheelhouse
     (cd "$HOME"; "${PYBIN}/nosetests" --with-cover --cover-package=ecos /io/src/test_interface.py /io/src/test_interface_bb.py)
 done
