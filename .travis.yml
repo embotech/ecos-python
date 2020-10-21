@@ -20,17 +20,17 @@ matrix:
     - sudo: required
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64 PYTHON=python36
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64 CIBW_SKIP: cp39-*
     - sudo: required
       services:
         - docker
-      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686 CIBW_SKIP: cp39-*
            PRE_CMD=linux32
     - os: osx
       env: PYTHON=python2
       sudo: required
     - os: osx
-      env: PYTHON=python3
+      env: PYTHON=python3 CIBW_SKIP: cp39-*
       sudo: required
 
 install:
