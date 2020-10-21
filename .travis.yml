@@ -4,42 +4,40 @@
 notifications:
   email: false
 
-language: python
+deploy:
+  provider: releases
+  api_key:
+    secure: EOGvA7WTRss3MYJiZWQI29FxHjuKZgteBzdBk7ZJW5a7VmjTVJMBbAD/EnDC2rRrtkhJ+8dtDpnA6y49bsktRnj3c+//SYryVgVu+gRuZRenRR9tAHiXNTylZ9+e1pJVUBwDLdaLuF1gmpQYYvzf5AGYLWSifhn+L3qytfBxj8w=
+  file_glob: true
+  file: wheelhouse/ecos-*.whl
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
 
-jobs:
+CIBW_SKIP: cp39-*
+
+matrix:
   include:
-    # perform a linux build
-    - services: docker
-    # and a mac build
+    - sudo: required
+      services:
+        - docker
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64
+    - sudo: required
+      services:
+        - docker
+      env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
+           PRE_CMD=linux32
     - os: osx
-      # PyPy 7.3.2 needs macOS >= 10.14
-      osx_image: xcode10.2
-      language: shell
-    # and a windows build
-    - os: windows
-      language: shell
-      before_install:
-        - choco install python --version 3.8.0
-        - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
-        # make sure it's on PATH as 'python3'
-        - ln -s /c/Python38/python.exe /c/Python38/python3.exe
-
-env:
-  global:
-    - TWINE_USERNAME=123
-    # Note: TWINE_PASSWORD is set to a PyPI API token in Travis settings
+      env: PYTHON=python2
+    - os: osx
+      env: PYTHON=python3
 
 install:
-  - python3 -m pip install cibuildwheel==1.6.3
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull $DOCKER_IMAGE; fi
 
 script:
-  # build the wheels, put them into './wheelhouse'
-  - python3 -m cibuildwheel --output-dir wheelhouse
-
-after_success:
-  # if the release was tagged, upload them to PyPI
-  - |
-    if [[ $TRAVIS_TAG ]]; then
-      python3 -m pip install twine
-      python3 -m twine upload wheelhouse/*.whl
-    fi
+  - make version
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build-wheels.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./travis/build-osx-wheels.sh; fi
+  - ls wheelhouse/
