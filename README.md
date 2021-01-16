@@ -148,6 +148,12 @@ When creating new versions of the Python wrapper, please use
 commit so that CI is able to properly pick it up. See
 [Release](RELEASE.md) for more information.
 
+## Python2 Support
+Starting with version 2.0.8, ecos-python will no longer support
+Python2.7. You may be able to download an [older
+version](https://github.com/embotech/ecos-python/releases/tag/2.0.7.post1)
+but moving forward we will no longer publish Python2 wheels for use.
+
 ## License
 
 ECOS is distributed under the [GNU General Public License

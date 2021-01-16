@@ -27,8 +27,6 @@ matrix:
       env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
            PRE_CMD=linux32
     - os: osx
-      env: PYTHON=python2
-    - os: osx
       env: PYTHON=python3
 
 install:
