@@ -142,6 +142,12 @@ the 2.0.7 release. Generally, `pip` should pick up the post release for
 2.0.7 and any dependencies such as `pip install "ecos>=2.0.5"` should still
 work as expected.
 
+## Deployment
+When creating new versions of the Python wrapper, please use
+`bumpversion` to bump the version number and also remember to tag the
+commit so that CI is able to properly pick it up. See
+[Release](release.md) for more information.
+
 ## License
 
 ECOS is distributed under the [GNU General Public License
