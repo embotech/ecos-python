@@ -146,7 +146,7 @@ work as expected.
 When creating new versions of the Python wrapper, please use
 `bumpversion` to bump the version number and also remember to tag the
 commit so that CI is able to properly pick it up. See
-[Release](release.md) for more information.
+[Release](RELEASE.md) for more information.
 
 ## License
 
