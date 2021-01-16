@@ -7,7 +7,7 @@ notifications:
 deploy:
   provider: releases
   api_key:
-    secure: EOGvA7WTRss3MYJiZWQI29FxHjuKZgteBzdBk7ZJW5a7VmjTVJMBbAD/EnDC2rRrtkhJ+8dtDpnA6y49bsktRnj3c+//SYryVgVu+gRuZRenRR9tAHiXNTylZ9+e1pJVUBwDLdaLuF1gmpQYYvzf5AGYLWSifhn+L3qytfBxj8w=
+    secure: VVUpxWmC7VkGcbniATyHZdxo7nMHqT7wYwzJ/lmvDm9IEhxwp2V9Fmra8J1oCRyBhVzbwqSsJzlAlffFu8DtneM6Ye0v4tWQr7Dt0XLICT+B0jz+YGeAQwsDljhNPQ5VsioDlrhoftD3gTBqKBQqMRDcSNwTISPUKZVcvDErBGU=
   file_glob: true
   file: wheelhouse/ecos-*.whl
   skip_cleanup: true
