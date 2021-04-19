@@ -4,6 +4,9 @@ set -e -x
 # Install a system package required by our library
 #yum install -y atlas-devel
 
+if [ $(uname -m) == "aarch64" ]; then
+    yum install -y blas-devel lapack-devel
+fi
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
     "${PYBIN}/pip" install nose coverage #-r /io/dev-requirements.txt
