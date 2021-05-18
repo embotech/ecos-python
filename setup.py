@@ -83,6 +83,9 @@ setup(
     package_dir = {'': 'src'},
     cmdclass = {'build_ext': build_ext},
     ext_modules = [_ecos],
+    setup_requires = [
+        "numpy >= 1.6"
+    ],
     install_requires = [
         "numpy >= 1.6",
         "scipy >= 0.9"
