@@ -1,7 +1,7 @@
 # Python Wrapper for Embedded Conic Solver (ECOS)
 
-[![Build Status](https://travis-ci.org/embotech/ecos-python.svg?branch=master)](https://travis-ci.org/embotech/ecos-python)
-[![Build Status](https://ci.appveyor.com/api/projects/status/78aatn417av1ul5u?svg=true)](https://ci.appveyor.com/project/echu/ecos-python)
+[![Build Status](http://github.com/embotech/ecos-python/workflows/build/badge.svg?event=push)](https://github.com/embotech/ecos-python/actions/workflows/build.yml)
+
 
 **Visit www.embotech.com/ECOS for detailed information on ECOS.**
 
@@ -106,16 +106,18 @@ Here is a small
 [example](http://www.cvxpy.org/en/latest/tutorial/advanced/index.html#solve-method-options)
 from the CVXPY tutorial:
 
-```
+```py
+import cvxpy as cp
+
 # Solving a problem with different solvers.
-x = Variable(2)
-obj = Minimize(norm(x, 2) + norm(x, 1))
+x = cp.Variable(2)
+obj = cp.Minimize(cp.norm(x, 2) + cp.norm(x, 1))
 constraints = [x >= 2]
-prob = Problem(obj, constraints)
+prob = cp.Problem(obj, constraints)
 
 # Solve with ECOS.
-prob.solve(solver=ECOS)
-print "optimal value with ECOS:", prob.value
+prob.solve(solver=cp.ECOS)
+print("optimal value with ECOS:", prob.value)
 ```
 
 ## ECOS Versioning
@@ -123,7 +125,7 @@ The Python module contains two version numbers:
 
 1. `ecos.__version__`: This is the version of the Python wrapper for
    ECOS
-2. `ecos__solver_version__`: This is the version of the underlying ECOS
+2. `ecos.__solver_version__`: This is the version of the underlying ECOS
    solver
 
 These two version numbers should typically agree, but they might not
