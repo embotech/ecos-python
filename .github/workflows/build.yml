@@ -97,6 +97,18 @@ jobs:
           echo "DEPLOY_PYPI_SOURCE=$( [[ $PYTHON_VERSION == 3.8 && $RUNNER_OS == 'macOS' ]] && echo 'True' || echo 'False' )" >> $GITHUB_ENV
           echo "DEPLOY=$( [[ $GITHUB_EVENT_NAME == 'push' && $GITHUB_REF == 'refs/tags'* ]] && echo 'True' || echo 'False' )" >> $GITHUB_ENV
 
+      - name: Remove Xcode
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            sudo rm -rf /Library/Developer/CommandLineTools
+          fi
+
+      - name: Downgrade xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '10.3'
+
       - name: Build wheels
         if: ${{'True' == 'True' || env.DEPLOY == 'True'}}
         env:
