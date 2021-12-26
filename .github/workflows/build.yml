@@ -49,10 +49,19 @@ jobs:
           elif [[ "$PYTHON_VERSION" == "3.10" ]]; then
             conda install scipy=1.7 numpy=1.21 nose
           fi
-          make install
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            sudo rm -rf /Library/Developer/CommandLineTools
+          fi
+
+      - name: Downgrade xcode
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '10.3'
 
       - name: Test
         run: |
+          make install
           python -m nose
           rm -rf build/
 
