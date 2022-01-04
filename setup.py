@@ -62,7 +62,7 @@ class build_ext(_build_ext):
 
 setup(
     name = 'ecos',
-    version = '2.0.8',
+    version = '2.0.9',
     # point to README.md file instead of plain-text readme
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
