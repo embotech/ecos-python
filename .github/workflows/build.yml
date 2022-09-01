@@ -53,12 +53,6 @@ jobs:
             sudo rm -rf /Library/Developer/CommandLineTools
           fi
 
-      - name: Downgrade xcode
-        if: runner.os == 'macOS'
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '11.7'
-
       - name: Test
         run: |
           make install
