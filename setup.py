@@ -63,11 +63,12 @@ class build_ext(_build_ext):
 setup(
     name = 'ecos',
     version = '2.0.10',
-    # point to README.md file instead of plain-text readme
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
     url = 'http://github.com/embotech/ecos',
     description = 'This is the Python package for ECOS: Embedded Cone Solver. See Github page for more information.',
+    long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     license = "GPLv3",
     packages = ['ecos'],
     package_dir = {'': 'src'},
