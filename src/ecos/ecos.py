@@ -50,8 +50,8 @@ def solve(c,G,h,dims,A=None,b=None, **kwargs):
 
     if G is None:
         data = np.zeros((0,),dtype=np.double)
-        indices = np.zeros((0,),dtype=int)
-        colptr = np.zeros((n1+1,),dtype=int)
+        indices = np.zeros((0,),dtype=np.int64)
+        colptr = np.zeros((n1+1,),dtype=np.int64)
         h = np.zeros((0,))
     else:
         data, indices, colptr = G.data, G.indices, G.indptr
