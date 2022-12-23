@@ -62,7 +62,7 @@ class build_ext(_build_ext):
 
 setup(
     name = 'ecos',
-    version = '2.0.11',
+    version = '2.0.12',
     author = 'Alexander Domahidi, Eric Chu, Han Wang, Santiago Akle',
     author_email = 'domahidi@embotech.com, echu@cs.stanford.edu, hanwang2@stanford.edu, tiagoakle@gmail.com',
     url = 'http://github.com/embotech/ecos',
