@@ -215,8 +215,8 @@ static PyObject *csolve(PyObject* self, PyObject *args, PyObject *kwargs)
   long mi_iterations = -1;
 
   /* Default ECOS settings */
-  settings opts_ecos;
-  settings_bb opts_ecos_bb;
+  settings opts_ecos = {0};
+  settings_bb opts_ecos_bb = {0};
 
   pwork* mywork = NULL;
   ecos_bb_pwork* myecos_bb_work = NULL;
