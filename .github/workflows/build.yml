@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-20.04, macos-11, windows-2019 ]
-        python-version: [ 3.7, 3.9, 3.8, "3.10", "3.11" ]
+        python-version: [ 3.7, 3.9, 3.8, "3.10", "3.11", "3.12" ]
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -50,6 +50,8 @@ jobs:
             conda install scipy=1.7 numpy=1.21 nose
           elif [[ "$PYTHON_VERSION" == "3.11" ]]; then
             conda install scipy=1.9.3 numpy=1.23.4 nose
+          elif [[ "$PYTHON_VERSION" == "3.12" ]]; then
+            conda install scipy=1.11.2 numpy=1.26.0 nose
           fi
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             sudo rm -rf /Library/Developer/CommandLineTools
@@ -69,7 +71,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-20.04, macos-11, windows-2019 ]
-        python-version: [ 3.7, 3.9, "3.10", "3.11" ]
+        python-version: [ 3.7, 3.9, "3.10", "3.11", "3.12" ]
         include:
           - os: ubuntu-20.04
             python-version: 3.8
