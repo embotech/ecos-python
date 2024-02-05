@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ecos
 import numpy as np
 import scipy.sparse as sp
@@ -17,8 +16,6 @@ dims['l'] = 4
 
 sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
 
-print(sol['x'])
-
 c = np.array([-1., -1.])
 h = np.array([ 4., 12., 0., 0.])
 bool_idx = []
@@ -32,8 +29,6 @@ dims = dict()
 dims['l'] = 4
 
 sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
-
-print(sol['x'])
 
 c = np.array([-1., -1.1])
 h = np.array([ 4., 12., 0., 0.])
@@ -49,8 +44,6 @@ dims['l'] = 4
 
 sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=False, int_vars_idx=bool_idx)
 
-print(sol['x'])
-
 
 c = np.array([-1., -1.5])
 h = np.array([ 4., 12., 0. , 0.])
@@ -65,5 +58,3 @@ dims = dict()
 dims['l'] = 4
 
 sol = ecos.solve(c, G, h, dims, verbose=False, mi_verbose=True, bool_vars_idx=bool_idx)
-print(sol)
-print(sol['x'])
