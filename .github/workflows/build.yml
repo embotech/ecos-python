@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04, macos-11, windows-2019 ]
+        os: [ ubuntu-20.04, macos-12, windows-2019 ]
         python-version: [ 3.7, 3.9, 3.8, "3.10", "3.11", "3.12" ]
 
     env:
@@ -70,13 +70,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04, macos-11, windows-2019 ]
+        os: [ ubuntu-20.04, macos-12, windows-2019 ]
         python-version: [ 3.7, 3.9, "3.10", "3.11", "3.12" ]
         include:
           - os: ubuntu-20.04
             python-version: 3.8
             single_action_config: "True"
-          - os: macos-11
+          - os: macos-12
             python-version: 3.8
           - os: windows-2019
             python-version: 3.8
